@@ -15,12 +15,12 @@ items = [
 	{ name = "Arch", evaluations = [
 		{ name = "FSF Recommended", score = 0.0, comment = "" },
 		{ name = "Binary Packages", score = 1.0, comment = "" },
-		{ name = "Dedicated Security Team", score = -inf, comment = "" },
-		{ name = "Reproducible Builds", score = -inf, comment = "" },
+		{ name = "Dedicated Security Team", score = 0.8, comment = "Arch Security Team and tracker, volunteer run." },
+		{ name = "Reproducible Builds", score = 0.7, comment = "About three quarters of packages; rebuilderd verification still experimental." },
 		{ name = "Rolling Release", score = 1.0, comment = "" },
-		{ name = "Non-free Firmware Available", score = -inf, comment = "" },
+		{ name = "Non-free Firmware Available", score = 1.0, comment = "linux-firmware is in core; no free/non-free split." },
 		{ name = "systemd", score = 1.0, comment = "" },
-		{ name = "Atomic Rollback", score = -inf, comment = "" },
+		{ name = "Atomic Rollback", score = 0.4, comment = "Possible with btrfs." },
 	]},
 	{ name = "Debian", evaluations = [
 		{ name = "FSF Recommended", score = 1.0, comment = "" },
@@ -35,11 +35,11 @@ items = [
 	{ name = "Guix System", evaluations = [
 		{ name = "FSF Recommended", score = 1.0, comment = "" },
 		{ name = "Binary Packages", score = 1.0, comment = "" },
-		{ name = "Dedicated Security Team", score = -inf, comment = "" },
+		{ name = "Dedicated Security Team", score = 0.3, comment = "Security mailing list, but no standing team." },
 		{ name = "Reproducible Builds", score = 1.0, comment = "" },
 		{ name = "Rolling Release", score = 1.0, comment = "" },
-		{ name = "Non-free Firmware Available", score = -inf, comment = "" },
+		{ name = "Non-free Firmware Available", score = 0.3, comment = "FSDG distro; only via the third party nonguix channel." },
 		{ name = "systemd", score = 0.0, comment = "Uses its own init written in Scheme." },
-		{ name = "Atomic Rollback", score = -inf, comment = "" },
+		{ name = "Atomic Rollback", score = 1.0, comment = "" },
 	]},
 ]

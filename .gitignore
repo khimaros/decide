@@ -3,3 +3,4 @@
 /web/dist/
 /web/node_modules/
 **/__pycache__/
+/topics/home-base.toml
