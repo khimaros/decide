@@ -389,10 +389,12 @@ DRAG_PROBE = r"""
 
   function report(o) { out.textContent = JSON.stringify(o); }
 
+  // document coordinates, so scrolling the page does not read as the layout
+  // moving underneath the drag.
   function boxes() {
     return Array.prototype.map.call(document.querySelectorAll('.card'), function (card) {
       var box = card.getBoundingClientRect();
-      return [Math.round(box.left), Math.round(box.top)];
+      return [Math.round(box.left + window.scrollX), Math.round(box.top + window.scrollY)];
     });
   }
 
@@ -420,25 +422,18 @@ DRAG_PROBE = r"""
       return setTimeout(run, 50);
     }
 
+    // sortable decides where the pointer is with elementFromPoint, which only
+    // sees what is on screen. a short window puts the target below the fold,
+    // so bring it into view first. the handle needs no such help: pointerdown
+    // goes straight to it rather than through hit testing.
+    target.scrollIntoView({block: 'center'});
+
     var before = boxes();
     var started = target.querySelectorAll('.list-item').length;
     var grab = middle(handle);
-    var drop = null;
-    var steps = [];
 
-    // walk the pointer over in steps, the way a hand would, letting sortable
-    // settle between them. the target is measured after the drag has begun,
-    // because making room for the row moves it.
-    function plan() {
-      // aim at a row already in the target list: sortable works out where to
-      // insert from the element under the pointer, not from the list box.
-      drop = middle(target.querySelector('.list-item') || target);
-      for (var i = 1; i <= 8; i++) {
-        steps.push({
-          x: Math.round(grab.x + ((drop.x - grab.x) * i) / 8),
-          y: Math.round(grab.y + ((drop.y - grab.y) * i) / 8)
-        });
-      }
+    function aim() {
+      return middle(target.querySelector('.list-item') || target);
     }
 
     fire(handle, 'pointerdown', grab);
@@ -447,26 +442,33 @@ DRAG_PROBE = r"""
     // where the cards sit once the drag is under way and the lists have made
     // room. everything after this point must not move them again.
     var settled = null;
-    var step = 0;
+    var attempts = 0;
+
     function walk() {
-      if (step < steps.length) {
-        fire(document, 'pointermove', steps[step]);
-        fire(target, 'pointermove', steps[step]);
-        step++;
-        return setTimeout(walk, 30);
-      }
+      var landed = target.querySelectorAll('.list-item').length > started;
+      if (landed || attempts >= 40) return finish(landed);
+      attempts++;
+      // re-aim every tick rather than following a path worked out in advance:
+      // making room moves the target, and so does the row once it lands.
+      var at = aim();
+      fire(document, 'pointermove', at);
+      fire(target, 'pointermove', at);
+      setTimeout(walk, 20);
+    }
+
+    function finish(landed) {
       var during = boxes();
       var flying = document.querySelectorAll(
         '.sortable-ghost, .sortable-drag, .sortable-fallback').length > 0;
-      var landed = target.querySelectorAll('.list-item').length;
-      fire(document, 'pointerup', drop);
-      report({flying: flying, moved: landed > started,
+      fire(document, 'pointerup', aim());
+      report({viewport: [window.innerWidth, window.innerHeight],
+              flying: flying, moved: landed, attempts: attempts,
               before: before, settled: settled, during: during});
     }
+
     setTimeout(function () {
       settled = boxes();
-      plan();
-      setTimeout(walk, 30);
+      setTimeout(walk, 20);
     }, 30);
   }
   run();
@@ -500,12 +502,13 @@ class DragTest(unittest.TestCase):
         self.assertNotIn('error', found, found)
         self.assertTrue(found['flying'], 'the drag never started, so nothing was tested')
         self.assertTrue(found['moved'],
-                        'the requirement never reached the other list, so no card '
-                        'changed height and the test proved nothing')
+                        'the requirement never reached the other list at %s after '
+                        '%s tries, so no card changed height and the test proved '
+                        'nothing' % (found['viewport'], found['attempts']))
         self.assertNotEqual(
             found['settled'], found['before'],
             'the lists never made room, so there was nothing to drop into')
         self.assertEqual(
             found['during'], found['settled'],
-            'cards moved while a requirement was in flight: %s -> %s'
-            % (found['settled'], found['during']))
+            'cards moved while a requirement was in flight at %s: %s -> %s'
+            % (found['viewport'], found['settled'], found['during']))
