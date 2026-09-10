@@ -1,0 +1,29 @@
+#name = "eReader"
+
+requirements = [
+	{ name = "USB-C Power", priority = 10 },
+	{ name = "Battery", priority = 20 },
+	{ name = "Screen Size", priority = 30 },
+	{ name = "Open Source", priority = 40 },
+	{ name = "KOReader", priority = 50 },
+	{ name = "Libre Hardware", priority = 60 },
+]
+
+items = [
+	{ name = "Onyx Boox Note Air", evaluations = [
+		{ name = "USB-C Power", score = 1.0, comment = "" },
+		{ name = "Battery", score = -inf, comment = "" },
+		{ name = "Screen Size", score = -inf, comment = "" },
+		{ name = "Open Source", score = -inf, comment = "" },
+		{ name = "KOReader", score = 1.0, comment = "" },
+		{ name = "Libre Hardware", score = -inf, comment = "" },
+	]},
+	{ name = "reMarkable 2", evaluations = [
+		{ name = "USB-C Power", score = 1.0, comment = "" },
+		{ name = "Battery", score = -inf, comment = "" },
+		{ name = "Screen Size", score = -inf, comment = "" },
+		{ name = "Open Source", score = -inf, comment = "" },
+		{ name = "KOReader", score = 0.0, comment = "" },
+		{ name = "Libre Hardware", score = -inf, comment = "" },
+	]},
+]

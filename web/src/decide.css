@@ -1,0 +1,332 @@
+:root {
+  /* tells the browser to match its own widgets, scrollbars and form
+     controls to whichever palette below is in force. */
+  color-scheme: light dark;
+
+  --brand: #0d6efd;
+  --brand-ink: #fff;
+  /* the brand colour drawn on a surface rather than behind text, which
+     needs to lift away from the background instead of sitting under it. */
+  --accent: #0d6efd;
+  --ink: #212529;
+  --muted: #6c757d;
+  --surface: #fff;
+  --header: #f8f9fa;
+  --page: #f4f5f7;
+  --line: rgba(0, 0, 0, 0.125);
+  --badge-bg: #6c757d;
+  --badge-ink: #fff;
+  --radius: 0.375rem;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+
+  /* narrowest a column may get before the layout drops one */
+  --column: 27rem;
+  --gutter: 1rem;
+  /* column balancing packs cards into as few columns as their tallest member
+     allows, so allowing a fourth would leave it empty on a wide screen. */
+  --columns: 3;
+
+  --good-bg: #d1e7dd;
+  --good-ink: #0f5132;
+  --fair-bg: #fff3cd;
+  --fair-ink: #664d03;
+  --poor-bg: #f8d7da;
+  --poor-ink: #842029;
+  --unknown-bg: #e9ecef;
+  --unknown-ink: #41464b;
+}
+
+/* the whole palette is redefined here, so everything downstream follows the
+   system theme without knowing the theme exists. the brand stays put: it is
+   only ever drawn behind text, where it reads the same either way. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #6ea8fe;
+    --ink: #e3e5e8;
+    --muted: #9198a1;
+    --surface: #1b1e23;
+    --header: #23272e;
+    --page: #121417;
+    --line: rgba(255, 255, 255, 0.14);
+    --badge-bg: #3a4149;
+    --badge-ink: #e3e5e8;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+
+    --good-bg: #10301f;
+    --good-ink: #7fd6a4;
+    --fair-bg: #332905;
+    --fair-ink: #f0cf5e;
+    --poor-bg: #3a1418;
+    --poor-ink: #f2949e;
+    --unknown-bg: #24282e;
+    --unknown-ink: #a5abb3;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding-bottom: 2rem;
+  background: var(--page);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* masthead */
+
+.masthead {
+  background: var(--brand);
+  padding: 0.5rem 1rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--brand-ink);
+  font-size: 1.25rem;
+  text-decoration: none;
+}
+
+.brand-mark {
+  width: 30px;
+  height: 24px;
+}
+
+/* layout */
+
+main {
+  padding: 0 1rem;
+}
+
+.headline {
+  margin: 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* a multi-column container packs cards up the columns instead of aligning
+   them into rows, so a short card does not leave a gap the height of the
+   tallest card beside it. */
+.columns {
+  columns: var(--column);
+  column-gap: var(--gutter);
+  max-width: calc(
+    var(--column) * var(--columns) + var(--gutter) * (var(--columns) - 1)
+  );
+  margin: 0 auto;
+}
+
+/* cards */
+
+.card {
+  /* block rather than flex: browsers only reliably honour break-inside on
+     block level children of a multi-column container. */
+  display: block;
+  margin-bottom: var(--gutter);
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: var(--header);
+  border-bottom: 1px solid var(--line);
+  border-radius: var(--radius) var(--radius) 0 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.card-header-brand {
+  background: var(--brand);
+  color: var(--brand-ink);
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+.card-hint {
+  margin: -1rem -1rem 1rem;
+  padding: 1rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.card-meta {
+  margin: 0.75rem 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* lists */
+
+.list {
+  min-height: 3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.list:empty {
+  border-style: dashed;
+}
+
+.list-item {
+  position: relative;
+  padding: 0.5rem 3rem 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.list-item:first-child {
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.list-item:last-child {
+  border-bottom: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.list-item.filtered {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+/* requirements */
+
+.handle {
+  display: inline-flex;
+  padding-right: 0.5rem;
+  color: var(--muted);
+  cursor: grab;
+  vertical-align: -0.15em;
+}
+
+.force {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.force[aria-pressed="true"] {
+  color: var(--accent);
+}
+
+.force > svg {
+  pointer-events: none;
+}
+
+.sortable-ghost {
+  opacity: 0.4;
+}
+
+/* items */
+
+.item {
+  cursor: pointer;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  border-radius: var(--radius);
+  background: var(--badge-bg);
+  color: var(--badge-ink);
+  font-size: 0.8em;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.badge-brand {
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-size: inherit;
+  font-weight: 500;
+}
+
+.item > .badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+}
+
+.detail {
+  margin-top: 0.75rem;
+}
+
+.detail-row {
+  position: relative;
+  margin-bottom: 0.25rem;
+  padding: 0.5rem 4rem 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+.detail-row .badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.detail-comment {
+  margin: 0.5rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+}
+
+.score-good {
+  background: var(--good-bg);
+  color: var(--good-ink);
+}
+
+.score-fair {
+  background: var(--fair-bg);
+  color: var(--fair-ink);
+}
+
+.score-poor {
+  background: var(--poor-bg);
+  color: var(--poor-ink);
+}
+
+.score-unknown {
+  background: var(--unknown-bg);
+  color: var(--unknown-ink);
+}
+
+/* buttons */
+
+.button {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius);
+  background: var(--brand);
+  color: var(--brand-ink);
+  text-decoration: none;
+}
+
+.button:hover {
+  filter: brightness(0.92);
+}

@@ -1,0 +1,27 @@
+[fruit]
+
+name = "Fruit"
+
+requirements = [
+	{ name = "Sweet", priority = 10 },
+	{ name = "Cheap", priority = 20 },
+	{ name = "Seasonal" },
+	{ name = "Sour", priority = -10 },
+]
+
+items = [
+	{ name = "Apple", evaluations = [
+		{ name = "Sweet", score = 1.0, comment = "very sweet" },
+		{ name = "Cheap", score = 0.5, comment = "" },
+		{ name = "Sour", score = 0.0, comment = "" },
+	]},
+	{ name = "Lemon", evaluations = [
+		{ name = "Sweet", score = 0.0, comment = "" },
+		{ name = "Cheap", score = 1.0, comment = "" },
+		{ name = "Sour", score = 1.0, comment = "unmistakably sour" },
+	]},
+	{ name = "Mystery", evaluations = [
+		{ name = "Sweet", score = -inf, comment = "" },
+	]},
+	{ name = "Template", skip = true },
+]

@@ -1,0 +1,50 @@
+#name = "Messaging App"
+
+requirements = [
+	{ name = "E2EE", priority = 10 },
+	{ name = "Always E2EE", priority = 20 },
+	{ name = "Groups", priority = 30 },
+	{ name = "Search Conversations", priority = 40 },
+	{ name = "Emoji", priority = 50 },
+	{ name = "Stickers", priority = 60 },
+	{ name = "Backups", priority = 70 },
+	{ name = "Audio Messages", priority = 80 },
+	{ name = "Group Audio Call", priority = 90 },
+	{ name = "Group Video Call", priority = 100 },
+	{ name = "Media List", priority = 110 },
+	{ name = "Save Message", priority = 120 },
+	{ name = "Server Message History", priority = 130 },
+]
+
+items = [
+	{ name = "Signal", evaluations = [
+		{ name = "E2EE", score = 1.0, comment = "" },
+		{ name = "Always E2EE", score = 1.0, comment = "" },
+		{ name = "Groups", score = 1.0, comment = "" },
+		{ name = "Search Conversations", score = -inf, comment = "" },
+		{ name = "Emoji", score = 1.0, comment = "" },
+		{ name = "Stickers", score = 1.0, comment = "" },
+		{ name = "Backups", score = 0.6, comment = "Must be configured manually." },
+		{ name = "Audio Messages", score = -inf, comment = "" },
+		{ name = "Group Audio Call", score = -inf, comment = "" },
+		{ name = "Group Video Call", score = -inf, comment = "" },
+		{ name = "Media List", score = -inf, comment = "" },
+		{ name = "Save Message", score = -inf, comment = "" },
+		{ name = "Server Message History", score = -inf, comment = "" },
+	]},
+	{ name = "Telegram", evaluations = [
+		{ name = "E2EE", score = 1.0, comment = "" },
+		{ name = "Always E2EE", score = 0.0, comment = "" },
+		{ name = "Groups", score = 1.0, comment = "" },
+		{ name = "Search Conversations", score = -inf, comment = "" },
+		{ name = "Emoji", score = -inf, comment = "" },
+		{ name = "Stickers", score = -inf, comment = "" },
+		{ name = "Backups", score = 1.0, comment = "" },
+		{ name = "Audio Messages", score = -inf, comment = "" },
+		{ name = "Group Audio Call", score = -inf, comment = "" },
+		{ name = "Group Video Call", score = -inf, comment = "" },
+		{ name = "Media List", score = -inf, comment = "" },
+		{ name = "Save Message", score = -inf, comment = "" },
+		{ name = "Server Message History", score = 1.0, comment = "" },
+	]},
+]

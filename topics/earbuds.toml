@@ -1,0 +1,15 @@
+#name = "Earbuds"
+
+requirements = [
+	{ name = "Bluetooth 5.0", priority = 10 },
+	{ name = "USB-C Power", priority = 20 },
+	{ name = "Battery Life >= 4h", priority = 30 },
+]
+
+items = [
+	{ name = "Pixel Buds 2", evaluations = [
+		{ name = "Bluetooth 5.0", score = 1.0, comment = "" },
+		{ name = "USB-C Power", score = 1.0, comment = "" },
+		{ name = "Battery Life >= 4h", score = 1.0, comment = "" },
+	]},
+]

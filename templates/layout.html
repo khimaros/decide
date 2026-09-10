@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{{ base }}static/decide.css" />
+    <link rel="icon" href="{{ base }}static/logo.svg" />
+    {% block head %}{% endblock %}
+    <title>{% block title %}Decide{% endblock %}</title>
+  </head>
+  <body>
+    <header class="masthead">
+      <a class="brand" href="{{ base }}index.html">
+        <img class="brand-mark" src="{{ base }}static/logo.svg" alt="" />
+        Decide
+      </a>
+    </header>
+
+    <main>
+      <h1 class="headline">
+        Which <span class="badge badge-brand">{% block subject %}topic{% endblock %}</span>
+        is right for you?
+      </h1>
+
+      {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

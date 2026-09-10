@@ -1,0 +1,11 @@
+# python only runs the end to end tests and `make serve`, but pin it anyway so
+# a failure is the code's fault rather than the interpreter's. versions older
+# than about 3.13 predate github artifact attestations, which recent mise
+# verifies and refuses to install without.
+[tools]
+# `make precommit` needs rustfmt and clippy. ask for them by name rather than
+# relying on the rustup profile: where rust is already installed, as on the
+# github runners, rustup keeps its existing minimal profile and mise inherits it.
+rust = { version = "1.97.0", components = ["rustfmt", "clippy"] }
+node = "25.9.0"
+python = "3.13.15"

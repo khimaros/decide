@@ -1,0 +1,24 @@
+{
+  "name": "decide-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "browser side of the decide static site",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "build": "npm run build:js && npm run build:css",
+    "build:js": "esbuild src/main.ts --bundle --minify --target=es2020 --outfile=dist/decide.js",
+    "build:css": "esbuild src/decide.css --bundle --minify --outfile=dist/decide.css",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "sortablejs": "^1.15.6"
+  },
+  "devDependencies": {
+    "@types/sortablejs": "^1.15.8",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
+  },
+  "allowScripts": {
+    "esbuild": false
+  }
+}

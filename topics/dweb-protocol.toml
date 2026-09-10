@@ -1,0 +1,47 @@
+#name = "Decentralized Web Protocol"
+
+requirements = [
+	{ priority = -10, name = "Financial Instrument", force = false },
+	{ priority = 20, name = "Ephemerality", force = false },
+	{ priority = 20, name = "Multiple Device Identity", force = false },
+	{ priority = 20, name = "Mutability", force = false },
+	{ priority = 40, name = "Offline First", force = false },
+]
+
+items = [
+	{ name = "Secure Scuttlebutt", evaluations = [
+		{ name = "Financial Instrument", score = -inf, comment = "" },
+		{ name = "Ephemerality", score = -inf, comment = "" },
+		{ name = "Multiple Device Identity", score = -inf, comment = "" },
+		{ name = "Mutability", score = -inf, comment = "" },
+		{ name = "Offline First", score = -inf, comment = "" },
+	]},
+	{ name = "Willow", evaluations = [
+		{ name = "Financial Instrument", score = -inf, comment = "" },
+		{ name = "Ephemerality", score = -inf, comment = "" },
+		{ name = "Multiple Device Identity", score = -inf, comment = "" },
+		{ name = "Mutability", score = -inf, comment = "" },
+		{ name = "Offline First", score = -inf, comment = "" },
+	]},
+	{ name = "earthstar", evaluations = [
+		{ name = "Financial Instrument", score = -inf, comment = "" },
+		{ name = "Ephemerality", score = -inf, comment = "" },
+		{ name = "Multiple Device Identity", score = -inf, comment = "" },
+		{ name = "Mutability", score = -inf, comment = "" },
+		{ name = "Offline First", score = -inf, comment = "" },
+	]},
+	{ name = "nostr", evaluations = [
+		{ name = "Financial Instrument", score = -inf, comment = "" },
+		{ name = "Ephemerality", score = -inf, comment = "" },
+		{ name = "Multiple Device Identity", score = -inf, comment = "" },
+		{ name = "Mutability", score = -inf, comment = "" },
+		{ name = "Offline First", score = -inf, comment = "" },
+	]},
+	{ name = "p2panda", evaluations = [
+		{ name = "Financial Instrument", score = -inf, comment = "" },
+		{ name = "Ephemerality", score = -inf, comment = "" },
+		{ name = "Multiple Device Identity", score = -inf, comment = "" },
+		{ name = "Mutability", score = -inf, comment = "" },
+		{ name = "Offline First", score = -inf, comment = "" },
+	]},
+]

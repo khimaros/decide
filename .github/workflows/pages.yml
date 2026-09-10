@@ -1,0 +1,50 @@
+name: pages
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+# deploy-pages needs these; everything else only reads the checkout.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# let a running deploy finish rather than publishing a half written site.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install the pinned toolchain
+        uses: jdx/mise-action@v2
+
+      - name: test
+        run: make precommit
+
+      - name: build
+        run: make
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

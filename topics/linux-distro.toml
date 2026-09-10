@@ -1,0 +1,45 @@
+#name = "Linux Distro"
+
+requirements = [
+	{ name = "FSF Recommended", priority = 10 },
+	{ name = "Binary Packages", priority = 20 },
+	{ name = "Dedicated Security Team", priority = 30 },
+	{ name = "Reproducible Builds", priority = 40 },
+	{ name = "Rolling Release", priority = 50 },
+	{ name = "Non-free Firmware Available", priority = 60 },
+	{ name = "systemd", priority = 70 },
+	{ name = "Atomic Rollback", priority = 80 },
+]
+
+items = [
+	{ name = "Arch", evaluations = [
+		{ name = "FSF Recommended", score = 0.0, comment = "" },
+		{ name = "Binary Packages", score = 1.0, comment = "" },
+		{ name = "Dedicated Security Team", score = -inf, comment = "" },
+		{ name = "Reproducible Builds", score = -inf, comment = "" },
+		{ name = "Rolling Release", score = 1.0, comment = "" },
+		{ name = "Non-free Firmware Available", score = -inf, comment = "" },
+		{ name = "systemd", score = 1.0, comment = "" },
+		{ name = "Atomic Rollback", score = -inf, comment = "" },
+	]},
+	{ name = "Debian", evaluations = [
+		{ name = "FSF Recommended", score = 1.0, comment = "" },
+		{ name = "Binary Packages", score = 1.0, comment = "" },
+		{ name = "Dedicated Security Team", score = 1.0, comment = "For stable release." },
+		{ name = "Reproducible Builds", score = 0.7, comment = "https://wiki.debian.org/ReproducibleBuilds" },
+		{ name = "Rolling Release", score = 0.6, comment = "Possible with testing/unstable." },
+		{ name = "Non-free Firmware Available", score = 0.8, comment = "Separate install image and non-free repo." },
+		{ name = "systemd", score = 1.0, comment = "" },
+		{ name = "Atomic Rollback", score = 0.4, comment = "Possible with btrfs." },
+	]},
+	{ name = "Guix System", evaluations = [
+		{ name = "FSF Recommended", score = 1.0, comment = "" },
+		{ name = "Binary Packages", score = 1.0, comment = "" },
+		{ name = "Dedicated Security Team", score = -inf, comment = "" },
+		{ name = "Reproducible Builds", score = 1.0, comment = "" },
+		{ name = "Rolling Release", score = 1.0, comment = "" },
+		{ name = "Non-free Firmware Available", score = -inf, comment = "" },
+		{ name = "systemd", score = 0.0, comment = "Uses its own init written in Scheme." },
+		{ name = "Atomic Rollback", score = -inf, comment = "" },
+	]},
+]

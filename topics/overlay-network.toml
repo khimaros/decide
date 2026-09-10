@@ -1,0 +1,57 @@
+requirements = [
+	{ priority = -90, name = "Financial Instrument", force = true },
+	{ priority = -10, name = "Bootstrap Nodes", force = false },
+	{ priority = 10, name = "Perfect Forward Secrecy", force = false },
+	{ priority = 10, name = "Private Routes", force = false },
+	{ priority = 30, name = "Mobile Friendly", force = false },
+	{ priority = 40, name = "Content Addressable Storage", force = false },
+	{ priority = 70, name = "Bridged to Plainnet", force = false },
+]
+
+items = [
+	{ name = "I2P", evaluations = [
+		{ name = "Financial Instrument", score = 0.0, comment = "" },
+		{ name = "Bootstrap Nodes", score = -inf, comment = "" },
+		{ name = "Perfect Forward Secrecy", score = -inf, comment = "" },
+		{ name = "Private Routes", score = -inf, comment = "" },
+		{ name = "Mobile Friendly", score = -inf, comment = "" },
+		{ name = "Content Addressable Storage", score = -inf, comment = "" },
+		{ name = "Bridged to Plainnet", score = 0.0, comment = "" },
+	]},
+	{ name = "Reticulum", evaluations = [
+		{ name = "Financial Instrument", score = 0.0, comment = "" },
+		{ name = "Bootstrap Nodes", score = 0.3, comment = "explicit TCP endpoints" },
+		{ name = "Perfect Forward Secrecy", score = -inf, comment = "" },
+		{ name = "Private Routes", score = 0.0, comment = "" },
+		{ name = "Mobile Friendly", score = 0.7, comment = "very low bandwidth" },
+		{ name = "Content Addressable Storage", score = 0.0, comment = "" },
+		{ name = "Bridged to Plainnet", score = 1.0, comment = "" },
+	]},
+	{ name = "The Onion Router", evaluations = [
+		{ name = "Financial Instrument", score = 0.0, comment = "" },
+		{ name = "Bootstrap Nodes", score = 1.0, comment = "" },
+		{ name = "Perfect Forward Secrecy", score = -inf, comment = "" },
+		{ name = "Private Routes", score = 1.0, comment = "" },
+		{ name = "Mobile Friendly", score = -inf, comment = "" },
+		{ name = "Content Addressable Storage", score = -inf, comment = "" },
+		{ name = "Bridged to Plainnet", score = 1.0, comment = "" },
+	]},
+	{ name = "Veilid", evaluations = [
+		{ name = "Financial Instrument", score = 0.0, comment = "" },
+		{ name = "Bootstrap Nodes", score = -inf, comment = "" },
+		{ name = "Perfect Forward Secrecy", score = 1.0, comment = "" },
+		{ name = "Private Routes", score = 1.0, comment = "private by default" },
+		{ name = "Mobile Friendly", score = 1.0, comment = "explicit design goal" },
+		{ name = "Content Addressable Storage", score = -inf, comment = "" },
+		{ name = "Bridged to Plainnet", score = 0.0, comment = "" },
+	]},
+	{ name = "yggdrasil", evaluations = [
+		{ name = "Financial Instrument", score = 0.0, comment = "" },
+		{ name = "Bootstrap Nodes", score = -inf, comment = "" },
+		{ name = "Perfect Forward Secrecy", score = -inf, comment = "" },
+		{ name = "Private Routes", score = 0.0, comment = "" },
+		{ name = "Mobile Friendly", score = -inf, comment = "" },
+		{ name = "Content Addressable Storage", score = -inf, comment = "" },
+		{ name = "Bridged to Plainnet", score = -inf, comment = "" },
+	]},
+]

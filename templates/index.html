@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="columns">
+  {% for topic in topics %}
+  <section class="card">
+    <h2 class="card-header">{{ topic.name }}</h2>
+    <div class="card-body">
+      <ul class="list">
+        {% for item in topic.items %}
+        <li class="list-item">{{ item }}</li>
+        {% endfor %}
+      </ul>
+      <p class="card-meta">
+        {{ topic.item_count }} items scored against {{ topic.requirement_count }} requirements
+      </p>
+      <a class="button" href="{{ base }}topics/{{ topic.slug }}/index.html">Decide</a>
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

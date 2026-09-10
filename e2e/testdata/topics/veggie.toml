@@ -1,0 +1,10 @@
+name = "Vegetables"
+
+requirements = [
+	{ name = "Crunchy", priority = 10, force = true },
+]
+
+items = [
+	{ name = "Carrot", evaluations = [ { name = "Crunchy", score = 1.0, comment = "" } ] },
+	{ name = "Spinach", evaluations = [ { name = "Crunchy", score = 0.0, comment = "" } ] },
+]

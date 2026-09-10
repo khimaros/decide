@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}Decide - {{ topic.name }}{% endblock %}
+{% block subject %}{{ topic.name }}{% endblock %}
+
+{# the data sits next to this page, so the name alone locates it #}
+{% block head %}<meta name="topic-data" content="{{ data }}" />{% endblock %}
+
+{% block content %}
+<div class="columns">
+  <section class="card">
+    <h2 class="card-header">Requirements</h2>
+    <div class="card-body">
+      <p class="card-hint">
+        These requirements are ordered by importance. Drag the handle to
+        rearrange them or move them to another section.
+        <b>Suggested items</b> are recalculated instantly.
+      </p>
+      <ul class="list sortable" id="requirements"></ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="card-header">Non-requirements</h2>
+    <div class="card-body">
+      <p class="card-hint">
+        Drag requirements you do not care about either way below this text.
+        They are left out of an item's score entirely.
+      </p>
+      <ul class="list sortable" id="nonrequirements"></ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="card-header">Anti-requirements</h2>
+    <div class="card-body">
+      <p class="card-hint">
+        Drag requirements you explicitly do <b>not</b> want below this text.
+        They count against an item's score, most strongly at the top.
+      </p>
+      <ul class="list sortable" id="antirequirements"></ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="card-header card-header-brand">Suggested items</h2>
+    <div class="card-body">
+      <p class="card-hint">
+        These items are scored and sorted by how well they match the
+        <b>Requirements</b> and <b>Anti-requirements</b>. Press an item to
+        see the detailed scores behind it.
+      </p>
+      <ul class="list" id="items"></ul>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ base }}static/decide.js"></script>
+{% endblock %}
