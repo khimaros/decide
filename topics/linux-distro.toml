@@ -1,14 +1,14 @@
 #name = "Linux Distro"
 
 requirements = [
-	{ name = "FSF Recommended", priority = 10 },
-	{ name = "Binary Packages", priority = 20 },
-	{ name = "Dedicated Security Team", priority = 30 },
-	{ name = "Reproducible Builds", priority = 40 },
-	{ name = "Rolling Release", priority = 50 },
-	{ name = "Non-free Firmware Available", priority = 60 },
-	{ name = "systemd", priority = 70 },
-	{ name = "Atomic Rollback", priority = 80 },
+	{ name = "FSF Recommended", priority = 5 },
+	{ name = "Binary Packages", priority = 10 },
+	{ name = "Dedicated Security Team", priority = 15 },
+	{ name = "Reproducible Builds", priority = 20 },
+	{ name = "Rolling Release", priority = 25 },
+	{ name = "Non-free Firmware Available", priority = 30 },
+	{ name = "systemd", priority = 35 },
+	{ name = "Atomic Rollback", priority = 40 },
 ]
 
 items = [

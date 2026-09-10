@@ -1,12 +1,12 @@
 #name = "eReader"
 
 requirements = [
-	{ name = "USB-C Power", priority = 10 },
-	{ name = "Battery", priority = 20 },
-	{ name = "Screen Size", priority = 30 },
-	{ name = "Open Source", priority = 40 },
-	{ name = "KOReader", priority = 50 },
-	{ name = "Libre Hardware", priority = 60 },
+	{ name = "USB-C Power", priority = 5 },
+	{ name = "Battery", priority = 10 },
+	{ name = "Screen Size", priority = 15 },
+	{ name = "Open Source", priority = 20 },
+	{ name = "KOReader", priority = 25 },
+	{ name = "Libre Hardware", priority = 30 },
 ]
 
 items = [

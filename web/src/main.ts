@@ -24,6 +24,7 @@ let topic: Topic;
 let required: HTMLElement;
 let excluded: HTMLElement;
 let itemList: HTMLElement;
+let sortable: HTMLElement[] = [];
 
 // remembered across redraws so an open item stays open while ranking changes
 const expanded = new Set<string>();
@@ -165,6 +166,29 @@ function itemElement(scored: Scored, ranking: Ranking): HTMLLIElement {
   return li;
 }
 
+// moving a requirement between lists changes two cards' heights, and a
+// multi-column container answers any height change by repacking every card, so
+// sections jump columns while the pointer is still down. give every list room
+// for one more row as the drag begins: the list the row left keeps its height,
+// and the list it lands in already had the space waiting.
+function reserveRoom(dragged: HTMLElement): void {
+  const room = dragged.getBoundingClientRect().height;
+  for (const list of sortable) {
+    list.style.minHeight = `${list.getBoundingClientRect().height + room}px`;
+    // the stylesheet draws the held space, and needs to know how tall it is.
+    list.style.setProperty("--room", `${room}px`);
+  }
+  document.body.classList.add("dragging");
+}
+
+function releaseRoom(): void {
+  for (const list of sortable) {
+    list.style.minHeight = "";
+    list.style.removeProperty("--room");
+  }
+  document.body.classList.remove("dragging");
+}
+
 // rescore every item against the current ranking and redraw the results.
 function update(): void {
   const ranking: Ranking = {
@@ -188,13 +212,22 @@ async function main(): Promise<void> {
     bucketOf(requirement, ignored).append(requirementElement(requirement, index));
   });
 
-  for (const list of [required, ignored, excluded]) {
+  sortable = [required, ignored, excluded];
+  for (const list of sortable) {
     Sortable.create(list, {
       group: "requirements",
       handle: ".handle",
       animation: 150,
       ghostClass: "sortable-ghost",
-      onEnd: update,
+      // drive the drag ourselves rather than through html5 drag and drop, which
+      // browsers implement inconsistently and which ignores touch entirely.
+      forceFallback: true,
+      onStart: (event) => reserveRoom(event.item),
+      // redraw while the room is still held, so the layout settles once.
+      onEnd: () => {
+        update();
+        releaseRoom();
+      },
     });
   }
 

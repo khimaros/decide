@@ -1,11 +1,11 @@
 #name = "Decentralized Web Protocol"
 
 requirements = [
-	{ priority = -10, name = "Financial Instrument", force = false },
-	{ priority = 20, name = "Ephemerality", force = false },
-	{ priority = 20, name = "Multiple Device Identity", force = false },
-	{ priority = 20, name = "Mutability", force = false },
-	{ priority = 40, name = "Offline First", force = false },
+	{ priority = -5, name = "Financial Instrument", force = false },
+	{ priority = 5, name = "Ephemerality", force = false },
+	{ priority = 10, name = "Multiple Device Identity", force = false },
+	{ priority = 15, name = "Mutability", force = false },
+	{ priority = 20, name = "Offline First", force = false },
 ]
 
 items = [

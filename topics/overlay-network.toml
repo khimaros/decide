@@ -1,11 +1,11 @@
 requirements = [
-	{ priority = -90, name = "Financial Instrument", force = true },
-	{ priority = -10, name = "Bootstrap Nodes", force = false },
-	{ priority = 10, name = "Perfect Forward Secrecy", force = false },
+	{ priority = -10, name = "Financial Instrument", force = true },
+	{ priority = -5, name = "Bootstrap Nodes", force = false },
+	{ priority = 5, name = "Perfect Forward Secrecy", force = false },
 	{ priority = 10, name = "Private Routes", force = false },
-	{ priority = 30, name = "Mobile Friendly", force = false },
-	{ priority = 40, name = "Content Addressable Storage", force = false },
-	{ priority = 70, name = "Bridged to Plainnet", force = false },
+	{ priority = 15, name = "Mobile Friendly", force = false },
+	{ priority = 20, name = "Content Addressable Storage", force = false },
+	{ priority = 25, name = "Bridged to Plainnet", force = false },
 ]
 
 items = [

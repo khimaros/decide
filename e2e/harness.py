@@ -95,15 +95,34 @@ def fmt(data, *flags):
                           cwd=ROOT, capture_output=True, text=True)
 
 
-def render(url):
+def render(url, window=None):
     """load a url in a real browser and return the dom its script produced."""
+    size = ['--window-size=%d,%d' % window] if window else []
     with tempfile.TemporaryDirectory() as profile:
         result = subprocess.run(
             [CHROME, '--headless', '--disable-gpu', '--no-sandbox',
-             '--user-data-dir=' + profile,
+             '--user-data-dir=' + profile, *size,
              '--virtual-time-budget=%d' % RENDER_BUDGET_MS, '--dump-dom', url],
             capture_output=True, text=True, timeout=120)
     return result.stdout
+
+
+def probe(path, script):
+    """add a script to a built page so a headless render can drive the ui and
+    leave its findings in #probe for the dump to carry back out."""
+    html = read(path)
+    assert '</body>' in html, path
+    with open(path, 'w') as f:
+        f.write(html.replace('</body>', '<script>%s</script></body>' % script))
+
+
+def probe_result(dom):
+    match = re.search(r'<pre id="probe">(.*?)</pre>', dom, re.S)
+    assert match, 'probe left no result'
+    text = match.group(1)
+    for entity, char in (('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&amp;', '&')):
+        text = text.replace(entity, char)
+    return json.loads(text)
 
 
 def scored_items(dom):

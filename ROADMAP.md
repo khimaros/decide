@@ -28,6 +28,8 @@
 [x] one time import of the hand-made topics from the legacy django database
 [x] masonry layout, so a short section does not leave a gap beside a tall one
 [x] dark mode, following the system theme
+[x] the cards hold still while a requirement is being dragged between them
+[x] `decide fmt` renumbers priorities 5 apart, keeping file order for ties
 ```
 
 ## data

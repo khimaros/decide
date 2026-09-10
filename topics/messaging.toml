@@ -1,19 +1,19 @@
 #name = "Messaging"
 
 requirements = [
-	{ name = "E2EE", priority = 10 },
-	{ name = "Always E2EE", priority = 20 },
-	{ name = "Groups", priority = 30 },
-	{ name = "Search Conversations", priority = 40 },
-	{ name = "Emoji", priority = 50 },
-	{ name = "Stickers", priority = 60 },
-	{ name = "Backups", priority = 70 },
-	{ name = "Audio Messages", priority = 80 },
-	{ name = "Group Audio Call", priority = 90 },
-	{ name = "Group Video Call", priority = 100 },
-	{ name = "Media List", priority = 110 },
-	{ name = "Save Message", priority = 120 },
-	{ name = "Server Message History", priority = 130 },
+	{ name = "E2EE", priority = 5 },
+	{ name = "Always E2EE", priority = 10 },
+	{ name = "Groups", priority = 15 },
+	{ name = "Search Conversations", priority = 20 },
+	{ name = "Emoji", priority = 25 },
+	{ name = "Stickers", priority = 30 },
+	{ name = "Backups", priority = 35 },
+	{ name = "Audio Messages", priority = 40 },
+	{ name = "Group Audio Call", priority = 45 },
+	{ name = "Group Video Call", priority = 50 },
+	{ name = "Media List", priority = 55 },
+	{ name = "Save Message", priority = 60 },
+	{ name = "Server Message History", priority = 65 },
 ]
 
 items = [

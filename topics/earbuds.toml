@@ -1,9 +1,9 @@
 #name = "Earbuds"
 
 requirements = [
-	{ name = "Bluetooth 5.0", priority = 10 },
-	{ name = "USB-C Power", priority = 20 },
-	{ name = "Battery Life >= 4h", priority = 30 },
+	{ name = "Bluetooth 5.0", priority = 5 },
+	{ name = "USB-C Power", priority = 10 },
+	{ name = "Battery Life >= 4h", priority = 15 },
 ]
 
 items = [

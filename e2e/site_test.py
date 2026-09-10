@@ -316,3 +316,185 @@ class FormatTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+SPACED_TOPIC = '''name = "Spacing"
+
+requirements = [
+\t{ name = "Second", priority = 10 },
+\t{ name = "First", priority = 10 },
+\t{ name = "Far", priority = 900 },
+\t{ name = "Avoid", priority = -40 },
+\t{ name = "Shun", priority = -40 },
+\t{ name = "Unranked" },
+]
+
+items = [
+\t{ name = "Apple" },
+]
+'''
+
+
+class PrioritySpacingTest(unittest.TestCase):
+    """fmt renumbers priorities so there is room to drop something between."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.data = os.path.join(self.tmp.name, 'data')
+        os.makedirs(os.path.join(self.data, 'topics'))
+        self.topic = os.path.join(self.data, 'topics', 'spacing.toml')
+        with open(self.topic, 'w') as f:
+            f.write(SPACED_TOPIC)
+
+    def test_it_spaces_priorities_five_apart_keeping_file_order_for_ties(self):
+        self.assertEqual(harness.fmt(self.data).returncode, 0)
+        out = harness.read(self.topic)
+        # anti-requirements stay negative so they keep their column, and the
+        # two that tied keep the order the file had them in.
+        self.assertIn('{ name = "Avoid", priority = -10 }', out)
+        self.assertIn('{ name = "Shun", priority = -5 }', out)
+        self.assertIn('{ name = "Second", priority = 5 }', out)
+        self.assertIn('{ name = "First", priority = 10 }', out)
+        self.assertIn('{ name = "Far", priority = 15 }', out)
+        self.assertIn('{ name = "Unranked" }', out)
+
+    def test_renumbering_is_idempotent(self):
+        harness.fmt(self.data)
+        once = harness.read(self.topic)
+        result = harness.fmt(self.data)
+        self.assertEqual(harness.read(self.topic), once)
+        self.assertIn('unchanged', result.stdout)
+
+
+# drives a real drag and reports where the cards sat before it started and
+# where they sat while the requirement was still in flight.
+DRAG_PROBE = r"""
+(function () {
+  var out = document.createElement('pre');
+  out.id = 'probe';
+  out.textContent = '{}';
+  document.body.appendChild(out);
+
+  function report(o) { out.textContent = JSON.stringify(o); }
+
+  function boxes() {
+    return Array.prototype.map.call(document.querySelectorAll('.card'), function (card) {
+      var box = card.getBoundingClientRect();
+      return [Math.round(box.left), Math.round(box.top)];
+    });
+  }
+
+  function middle(el) {
+    var box = el.getBoundingClientRect();
+    return {x: Math.round(box.left + box.width / 2), y: Math.round(box.top + box.height / 2)};
+  }
+
+  // sortable listens for pointer events, so mouse events alone drive nothing.
+  function fire(el, type, at) {
+    el.dispatchEvent(new PointerEvent(type, {
+      bubbles: true, cancelable: true, composed: true, view: window,
+      pointerId: 1, pointerType: 'mouse', isPrimary: true,
+      clientX: at.x, clientY: at.y, screenX: at.x, screenY: at.y,
+      button: 0, buttons: 1
+    }));
+  }
+
+  var tries = 0;
+  function run() {
+    var handle = document.querySelector('#requirements .list-item .handle');
+    var target = document.getElementById('antirequirements');
+    if (!handle || !target) {
+      if (++tries > 100) return report({error: 'page never rendered'});
+      return setTimeout(run, 50);
+    }
+
+    var before = boxes();
+    var started = target.querySelectorAll('.list-item').length;
+    var grab = middle(handle);
+    var drop = null;
+    var steps = [];
+
+    // walk the pointer over in steps, the way a hand would, letting sortable
+    // settle between them. the target is measured after the drag has begun,
+    // because making room for the row moves it.
+    function plan() {
+      // aim at a row already in the target list: sortable works out where to
+      // insert from the element under the pointer, not from the list box.
+      drop = middle(target.querySelector('.list-item') || target);
+      for (var i = 1; i <= 8; i++) {
+        steps.push({
+          x: Math.round(grab.x + ((drop.x - grab.x) * i) / 8),
+          y: Math.round(grab.y + ((drop.y - grab.y) * i) / 8)
+        });
+      }
+    }
+
+    fire(handle, 'pointerdown', grab);
+    fire(document, 'pointermove', {x: grab.x, y: grab.y + 12});
+
+    // where the cards sit once the drag is under way and the lists have made
+    // room. everything after this point must not move them again.
+    var settled = null;
+    var step = 0;
+    function walk() {
+      if (step < steps.length) {
+        fire(document, 'pointermove', steps[step]);
+        fire(target, 'pointermove', steps[step]);
+        step++;
+        return setTimeout(walk, 30);
+      }
+      var during = boxes();
+      var flying = document.querySelectorAll(
+        '.sortable-ghost, .sortable-drag, .sortable-fallback').length > 0;
+      var landed = target.querySelectorAll('.list-item').length;
+      fire(document, 'pointerup', drop);
+      report({flying: flying, moved: landed > started,
+              before: before, settled: settled, during: during});
+    }
+    setTimeout(function () {
+      settled = boxes();
+      plan();
+      setTimeout(walk, 30);
+    }, 30);
+  }
+  run();
+})();
+"""
+
+
+class DragTest(unittest.TestCase):
+    """the layout must hold still while a requirement is in flight."""
+
+    # wide enough that the cards actually pack into several columns, which is
+    # where a mid-drag reflow is most obvious.
+    WINDOW = (1600, 1000)
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.output = os.path.join(self.tmp.name, SITE_DIR)
+        result = harness.build(self.output)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        harness.probe(os.path.join(self.output, 'topics', 'fruit', 'index.html'),
+                      DRAG_PROBE)
+        self.server = harness.WebServer(self.tmp.name).__enter__()
+        self.addCleanup(self.server.__exit__, None, None, None)
+        self.base = urljoin(self.server.url, SITE_DIR + '/')
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_cards_hold_still_while_a_requirement_is_dragged(self):
+        dom = harness.render(urljoin(self.base, 'topics/fruit/'), window=self.WINDOW)
+        found = harness.probe_result(dom)
+        self.assertNotIn('error', found, found)
+        self.assertTrue(found['flying'], 'the drag never started, so nothing was tested')
+        self.assertTrue(found['moved'],
+                        'the requirement never reached the other list, so no card '
+                        'changed height and the test proved nothing')
+        self.assertNotEqual(
+            found['settled'], found['before'],
+            'the lists never made room, so there was nothing to drop into')
+        self.assertEqual(
+            found['during'], found['settled'],
+            'cards moved while a requirement was in flight: %s -> %s'
+            % (found['settled'], found['during']))

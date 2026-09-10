@@ -185,6 +185,32 @@ main {
   border-style: dashed;
 }
 
+/* every list holds room for one more row while a drag is in flight. outline
+   that space so it reads as somewhere to aim, rather than as a gap. it is
+   positioned out of flow: given height it would enlarge the very list it is
+   meant to sit inside. */
+.dragging .list {
+  position: relative;
+}
+
+.dragging .list::after {
+  content: "";
+  position: absolute;
+  right: 0.25rem;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  height: calc(var(--room) - 0.5rem);
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius);
+  /* the row being dragged over this list must still receive the pointer. */
+  pointer-events: none;
+}
+
+/* rows sit above the outline, so it disappears under whichever one lands. */
+.dragging .list-item {
+  z-index: 1;
+}
+
 .list-item {
   position: relative;
   padding: 0.5rem 3rem 0.5rem 0.75rem;
@@ -238,6 +264,17 @@ main {
 
 .sortable-ghost {
   opacity: 0.4;
+}
+
+/* the row in flight is a clone we draw ourselves, since forcing the fallback
+   takes the browser's own drag image out of the picture. it has left the list
+   it was drawn in, so it has to carry its own edges. */
+.sortable-fallback {
+  opacity: 0.95;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+  cursor: grabbing;
 }
 
 /* items */

@@ -98,7 +98,13 @@ it gives every item an entry for every requirement, puts requirements in
 the order the site ranks them, sorts items by name with `skip` templates
 first, and lines each item's evaluations up with the requirements. comments
 and existing formatting are preserved, and running it twice changes
-nothing. `decide fmt --check` writes nothing and exits non-zero if any file
+nothing.
+
+it also renumbers `priority` in steps of 5, so there is room to drop a new
+requirement between two neighbours without renumbering the rest by hand.
+requirements that shared a priority are separated in the order the file
+already had them, and anti-requirements stay negative so they keep their
+column. `decide fmt --check` writes nothing and exits non-zero if any file
 is out of shape, which is what CI runs.
 
 if you rename or delete a requirement, the evaluations that referred to it

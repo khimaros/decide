@@ -1,13 +1,13 @@
 requirements = [
-	{ priority = 10, name = "Transport: LoRa Radio", force = false },
-	{ priority = 20, name = "Operating System: Android", force = false },
-	{ priority = 20, name = "Operating System: iOS", force = false },
+	{ priority = 5, name = "Transport: LoRa Radio", force = false },
+	{ priority = 10, name = "Operating System: Android", force = false },
+	{ priority = 15, name = "Operating System: iOS", force = false },
 	{ priority = 20, name = "Transport: Bluetooth LE", force = false },
-	{ priority = 30, name = "Bridged Transport", force = false },
+	{ priority = 25, name = "Bridged Transport", force = false },
 	{ priority = 30, name = "Operating System: Linux", force = false },
-	{ priority = 30, name = "Transport: Internet", force = false },
+	{ priority = 35, name = "Transport: Internet", force = false },
 	{ priority = 40, name = "Transport: Sneakernet", force = false },
-	{ priority = 50, name = "Content Publishing", force = false },
+	{ priority = 45, name = "Content Publishing", force = false },
 	{ priority = 50, name = "E2EE Private Messages", force = false },
 ]
 

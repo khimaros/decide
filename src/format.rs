@@ -33,6 +33,9 @@ const NESTED_INDENT: &str = "\n\t\t";
 /// what an unscored requirement looks like once written down.
 const UNEVALUATED: &str = "-inf";
 
+/// gap left between renumbered priorities.
+const PRIORITY_STEP: i64 = 5;
+
 pub struct Options {
     /// report what would change instead of writing it
     pub check: bool,
@@ -117,7 +120,46 @@ fn order_requirements(topic: &mut Table) -> Vec<String> {
         let priority = field(value, PRIORITY).and_then(Value::as_integer);
         topics::priority_key(priority)
     });
+    renumber_priorities(array);
     array.iter().filter_map(entry_name).collect()
+}
+
+fn priority_of(value: &Value) -> Option<i64> {
+    field(value, PRIORITY).and_then(Value::as_integer)
+}
+
+/// space the ranked requirements evenly in the order they now sit, so there is
+/// room to drop something between two neighbours without renumbering by hand.
+/// anti-requirements stay negative, or they would change column. ties broke in
+/// file order during the sort above, and that order is what gets numbered.
+fn renumber_priorities(array: &mut Array) {
+    let negatives = array
+        .iter()
+        .filter(|value| priority_of(value).is_some_and(|priority| priority < 0))
+        .count() as i64;
+
+    let mut rank = 0;
+    for value in array.iter_mut() {
+        let Some(table) = value.as_inline_table_mut() else {
+            continue;
+        };
+        if table.get(PRIORITY).and_then(Value::as_integer).is_none() {
+            continue;
+        }
+        rank += 1;
+        let spaced = if rank <= negatives {
+            (rank - negatives - 1) * PRIORITY_STEP
+        } else {
+            (rank - negatives) * PRIORITY_STEP
+        };
+        let Some(priority) = table.get_mut(PRIORITY) else {
+            continue;
+        };
+        // assign through the existing value so its spacing survives.
+        let decor = priority.decor().clone();
+        *priority = Value::from(spaced);
+        *priority.decor_mut() = decor;
+    }
 }
 
 /// templates first, so they stay easy to find, then everything by name.
@@ -343,7 +385,8 @@ mod tests {
 
     #[test]
     fn comments_and_untouched_lines_survive() {
-        let text = "# how sweet it is\nrequirements = [\n\t{ name = \"A\", priority = 10 },\n]\n\
+        // priority 5 because the first ranked requirement is renumbered there.
+        let text = "# how sweet it is\nrequirements = [\n\t{ name = \"A\", priority = 5 },\n]\n\
                     items = [\n\t{ name = \"one\", evaluations = [\n\t\t{ name = \"A\", score = 1.0, comment = \"kept\" },\n\t]},\n]\n";
         let (out, report) = run(text, &OPTIONS).unwrap();
         assert!(out.contains("# how sweet it is"), "{out}");

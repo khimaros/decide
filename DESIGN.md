@@ -60,6 +60,14 @@ count is capped at `--columns`, since column balancing packs cards into as
 few columns as their tallest member allows and would otherwise leave a
 trailing column empty on a wide screen.
 
+balancing is also why a drag has to reserve space. a container that repacks
+on any height change will happily move a section to another column while the
+pointer is still down, and the row leaving one list and arriving in another
+is exactly such a change. so as a drag begins every list grows by the height
+of the row in flight: the list it left keeps its height, the list it lands in
+already had the room, and no card resizes in between. the reserved strip is
+drawn dashed, so the space doubles as the invitation to drop.
+
 `web/src/score.ts` is pure: items in, ranked items out. `web/src/main.ts`
 owns the DOM, and treats the DOM as the single source of truth for the
 current ranking. reordering a list triggers a rescore that reads the lists
