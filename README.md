@@ -25,6 +25,9 @@ requirement, along with any comment explaining it.
 the bookmark toggle on a requirement insists on it: items that do not fully
 meet a forced requirement are struck through and pushed down the list.
 
+the same explanation is a click away on the site itself, behind the **?** in
+the top right of every page.
+
 ## writing topics
 
 a topic is a TOML table with `requirements` and `items`. give it a file in

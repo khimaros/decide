@@ -99,10 +99,21 @@ class SiteTest(unittest.TestCase):
                 status, _ = fetch(target)
                 self.assertEqual(status, 200, target)
 
-    def test_index_links_to_every_topic(self):
+    def test_index_links_to_every_topic_by_directory(self):
+        # a directory, not its index.html: the server picks the index, and the
+        # url a reader copies out of the bar stays the tidy one.
         refs = self.parsed(self.base).refs
         for slug in ('fruit', 'veggie'):
-            self.assertIn('topics/%s/index.html' % slug, refs)
+            self.assertIn('./topics/%s/' % slug, refs)
+        self.assertNotIn('index.html', ' '.join(refs))
+
+    def test_every_page_offers_help_on_how_to_read_it(self):
+        for url in self.pages():
+            _, body = fetch(url)
+            html = body.decode('utf-8')
+            self.assertIn('popovertarget="help"', html, url)
+            self.assertIn('id="help"', html, url)
+            self.assertIn('popover', html, url)
 
     def test_a_topic_file_supplies_its_own_slug_and_name(self):
         parser = self.parsed(urljoin(self.base, 'topics/veggie/'))

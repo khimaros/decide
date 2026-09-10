@@ -10,11 +10,41 @@
   </head>
   <body>
     <header class="masthead">
-      <a class="brand" href="{{ base }}index.html">
+      <a class="brand" href="{{ base }}">
         <img class="brand-mark" src="{{ base }}static/logo.svg" alt="" />
         Decide
       </a>
+      <button class="help" type="button" popovertarget="help" aria-label="how to read this page">?</button>
     </header>
+
+    <!-- a popover rather than a dialog, so it opens and dismisses without any
+         script of its own. -->
+    <div class="panel" id="help" popover>
+      <h2 class="panel-title">How to read this page</h2>
+      <p>
+        Each topic page has four columns. <strong>Requirements</strong> are the
+        things you want, most important at the top.
+        <strong>Non-requirements</strong> are the things you do not care about
+        either way. <strong>Anti-requirements</strong> are the things you
+        actively want to avoid. <strong>Suggested items</strong> are the
+        candidates, best match first.
+      </p>
+      <p>
+        Drag a requirement by its handle to reorder it, or to move it between
+        the first three columns. Every item is rescored and resorted as you do
+        it, so two people with the same data and different priorities get
+        different answers.
+      </p>
+      <p>
+        Press an item to see the score behind every requirement, along with any
+        comment explaining it. The bookmark toggle on a requirement insists on
+        it: items that do not fully meet a forced requirement are struck
+        through and pushed down the list.
+      </p>
+      <button class="button" type="button" popovertarget="help" popovertargetaction="hide">
+        Got it
+      </button>
+    </div>
 
     <main>
       <h1 class="headline">

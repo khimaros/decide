@@ -80,8 +80,29 @@ body {
 /* masthead */
 
 .masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background: var(--brand);
   padding: 0.5rem 1rem;
+}
+
+.help {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  background: transparent;
+  color: var(--brand-ink);
+  border: 1px solid var(--brand-ink);
+  border-radius: 50%;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.help:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .brand {
@@ -355,15 +376,48 @@ main {
 
 /* buttons */
 
+/* drawn on both links and buttons, so it has to overrule the widget styling a
+   browser gives a <button> of its own accord. */
 .button {
   display: inline-block;
   padding: 0.375rem 0.75rem;
+  border: 0;
   border-radius: var(--radius);
   background: var(--brand);
   color: var(--brand-ink);
+  font: inherit;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .button:hover {
   filter: brightness(0.92);
+}
+
+/* help panel */
+
+/* a popover, so the browser handles opening, light dismissal, escape and the
+   backdrop without a line of script. */
+.panel {
+  max-width: 34rem;
+  margin: auto;
+  padding: 1.5rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.3);
+}
+
+.panel::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.panel-title {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.panel p {
+  margin: 0 0 1rem;
 }

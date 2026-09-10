@@ -30,6 +30,8 @@
 [x] dark mode, following the system theme
 [x] the cards hold still while a requirement is being dragged between them
 [x] `decide fmt` renumbers priorities 5 apart, keeping file order for ties
+[x] links point at a topic's directory rather than its index.html
+[x] a "?" in the masthead opening a panel on how to read the page
 ```
 
 ## data

@@ -27,8 +27,10 @@ const DATA_FILE: &str = "topic.json";
 const PREVIEW_ITEMS: usize = 5;
 
 /// pages reach their assets through a relative prefix so the site can be
-/// served from any path, eg. https://khimaros.github.io/decide/.
-const INDEX_BASE: &str = "";
+/// served from any path, eg. https://khimaros.github.io/decide/. the index
+/// says `./` rather than nothing, so that a link to the base alone is still
+/// a url a browser will follow.
+const INDEX_BASE: &str = "./";
 const TOPIC_BASE: &str = "../../";
 
 /// a topic as it appears on the index page.
