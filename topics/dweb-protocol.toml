@@ -1,5 +1,10 @@
 #name = "Decentralized Web Protocol"
 
+# these are specifications rather than products, so a source is the part of
+# the spec that defines the behaviour being scored, named down to its heading
+# or the line it was read from. a row that cannot be traced to the spec's own
+# words is left uncited.
+
 requirements = [
 	{ priority = -5, name = "Financial Instrument", force = false },
 	{ priority = 5, name = "Ephemerality", force = false },
@@ -10,38 +15,38 @@ requirements = [
 
 items = [
 	{ name = "Secure Scuttlebutt", evaluations = [
-		{ name = "Financial Instrument", score = 0.0, comment = "" },
-		{ name = "Ephemerality", score = 0.0, comment = "append-only log, nothing expires" },
-		{ name = "Multiple Device Identity", score = 0.0, comment = "one feed per key, forks break replication" },
-		{ name = "Mutability", score = 0.0, comment = "" },
-		{ name = "Offline First", score = 1.0, comment = "" },
+		{ name = "Financial Instrument", score = 0.0, comment = "", sources = ["https://ssbc.github.io/scuttlebutt-protocol-guide/", "the guide specifies feeds, messages, identities and replication, and no token or ledger"] },
+		{ name = "Ephemerality", score = 0.0, comment = "append-only log, nothing expires", sources = ["https://ssbc.github.io/scuttlebutt-protocol-guide/", "\"The messages in a feed form an append-only log, meaning that once a message is posted it cannot be modified.\""] },
+		{ name = "Multiple Device Identity", score = 0.0, comment = "one feed per key, forks break replication", sources = ["https://ssbc.github.io/scuttlebutt-protocol-guide/", "\"Each message (except the first one) references the ID of the previous message, allowing a chain to be constructed back to the first message in the feed.\": two devices signing with one key break that chain"] },
+		{ name = "Mutability", score = 0.0, comment = "", sources = ["https://ssbc.github.io/scuttlebutt-protocol-guide/", "\"once a message is posted it cannot be modified\""] },
+		{ name = "Offline First", score = 1.0, comment = "", sources = ["https://ssbc.github.io/scuttlebutt-protocol-guide/", "\"Scuttlebutt is a protocol for building decentralized applications that work well offline and that no one person can control.\""] },
 	]},
 	{ name = "Willow", evaluations = [
-		{ name = "Financial Instrument", score = 0.0, comment = "" },
-		{ name = "Ephemerality", score = 0.4, comment = "prefix pruning and payload forgetting, but no time-based expiry" },
-		{ name = "Multiple Device Identity", score = 1.0, comment = "meadowcap delegates subspace writes to per-device keys" },
-		{ name = "Mutability", score = 1.0, comment = "newer entry at a path replaces the old one" },
-		{ name = "Offline First", score = 1.0, comment = "state-based CRDT, sneakernet drops" },
+		{ name = "Financial Instrument", score = 0.0, comment = "", sources = ["https://willowprotocol.org/specs/data-model/index.html", "the data model specifies payloads, paths, timestamps, subspaces and namespaces, and no token or ledger"] },
+		{ name = "Ephemerality", score = 0.4, comment = "prefix pruning and payload forgetting, but no time-based expiry", sources = ["https://willowprotocol.org/specs/data-model/index.html", "\"We call this mechanism prefix pruning. The entries prefixed by blog idea are deleted by a newer entry at that prefix.\": deletion is by writing, never by a clock"] },
+		{ name = "Multiple Device Identity", score = 1.0, comment = "meadowcap delegates subspace writes to per-device keys", sources = ["https://willowprotocol.org/specs/meadowcap/index.html", "\"capability delegation\": \"Alfie can mint a new capability for Betty by signing his own capability together with her public key.\""] },
+		{ name = "Mutability", score = 1.0, comment = "newer entry at a path replaces the old one", sources = ["https://willowprotocol.org/specs/data-model/index.html", "\"Willow tracks timestamps of write operations, newer writes replace older writes in the manner of a traditional file system.\""] },
+		{ name = "Offline First", score = 1.0, comment = "state-based CRDT, sneakernet drops", sources = ["https://willowprotocol.org/specs/data-model/index.html", "\"Stores form a join semi-lattice (also known as a state-based CRDT) under the join operation.\""] },
 	]},
 	{ name = "earthstar", evaluations = [
-		{ name = "Financial Instrument", score = 0.0, comment = "" },
-		{ name = "Ephemerality", score = 1.0, comment = "deleteAfter timestamps, expiry enforced network-wide" },
-		{ name = "Multiple Device Identity", score = 0.7, comment = "same keypair copied per device, no per-device key" },
-		{ name = "Mutability", score = 1.0, comment = "latest timestamp per path wins" },
-		{ name = "Offline First", score = 1.0, comment = "" },
+		{ name = "Financial Instrument", score = 0.0, comment = "", sources = ["https://earthstar-project.org/", "\"No blockchain. No tokens.\""] },
+		{ name = "Ephemerality", score = 1.0, comment = "deleteAfter timestamps, expiry enforced network-wide", sources = ["https://earthstar-project.org/specs/data-spec-es5", "\"Ephemeral documents: deleteAfter\": \"deleteAfter?: number; // integer. when the document expires. absent for non-expiring documents.\""] },
+		{ name = "Multiple Device Identity", score = 0.7, comment = "same keypair copied per device, no per-device key", sources = ["https://earthstar-project.org/", "\"One identity across many devices.\""] },
+		{ name = "Mutability", score = 1.0, comment = "latest timestamp per path wins", sources = ["https://earthstar-project.org/specs/data-spec-es5", "\"When a new document arrives and an existing older one is already there (from the same identity and at the same path), the new document overwrites the old one.\""] },
+		{ name = "Offline First", score = 1.0, comment = "", sources = ["https://earthstar-project.org/", "\"Works offline.\" and \"Sneakernets.\""] },
 	]},
 	{ name = "nostr", evaluations = [
-		{ name = "Financial Instrument", score = 0.8, comment = "no native token, but lightning zaps (NIP-57) are pervasive" },
-		{ name = "Ephemerality", score = 0.8, comment = "ephemeral kinds 20000-29999; NIP-09 deletion is advisory" },
-		{ name = "Multiple Device Identity", score = 0.9, comment = "one key works everywhere; NIP-46 avoids copying it" },
-		{ name = "Mutability", score = 0.7, comment = "replaceable kinds only; regular notes need NIP-09" },
-		{ name = "Offline First", score = 0.0, comment = "relays required" },
+		{ name = "Financial Instrument", score = 0.8, comment = "no native token, but lightning zaps (NIP-57) are pervasive", sources = ["https://github.com/nostr-protocol/nips/blob/master/57.md", "NIP-57 \"Lightning Zaps\""] },
+		{ name = "Ephemerality", score = 0.8, comment = "ephemeral kinds 20000-29999; NIP-09 deletion is advisory", sources = ["https://github.com/nostr-protocol/nips/blob/master/01.md", "NIP-01: kinds 20000 to 29999 are ephemeral", "https://github.com/nostr-protocol/nips/blob/master/09.md", "NIP-09 \"Event Deletion Request\": a request, which relays need not honour"] },
+		{ name = "Multiple Device Identity", score = 0.9, comment = "one key works everywhere; NIP-46 avoids copying it", sources = ["https://github.com/nostr-protocol/nips/blob/master/46.md", "NIP-46 \"Nostr Remote Signing\""] },
+		{ name = "Mutability", score = 0.7, comment = "replaceable kinds only; regular notes need NIP-09", sources = ["https://github.com/nostr-protocol/nips/blob/master/01.md", "NIP-01: replaceable and addressable kinds, everything else being a regular event"] },
+		{ name = "Offline First", score = 0.0, comment = "relays required", sources = ["https://github.com/nostr-protocol/nips/blob/master/01.md", "NIP-01: clients publish to and subscribe from relays over websockets"] },
 	]},
 	{ name = "p2panda", evaluations = [
-		{ name = "Financial Instrument", score = 0.0, comment = "" },
-		{ name = "Ephemerality", score = 0.5, comment = "expiry and pruning specified, not yet implemented" },
-		{ name = "Multiple Device Identity", score = 1.0, comment = "key pair reuse across devices, forks tolerated" },
-		{ name = "Mutability", score = 1.0, comment = "documents take UPDATE and DELETE operations" },
-		{ name = "Offline First", score = 1.0, comment = "delay tolerant, out-of-order arrival expected" },
+		{ name = "Financial Instrument", score = 0.0, comment = "", sources = ["https://p2panda.org/", "the crate list covers networking, sync, blobs, store, streams, spaces, encryption and auth, and no token or ledger"] },
+		{ name = "Ephemerality", score = 0.5, comment = "expiry and pruning specified, not yet implemented", sources = ["https://p2panda.org/", "\"p2panda-sync Local-first sync for append-only logs and traits to build your own.\": the logs append, and pruning is not among the crates"] },
+		{ name = "Multiple Device Identity", score = 1.0, comment = "key pair reuse across devices, forks tolerated", sources = ["https://p2panda.org/", "\"p2panda-spaces Data encryption for multi-device groups.\""] },
+		{ name = "Mutability", score = 1.0, comment = "documents take UPDATE and DELETE operations", sources = ["https://p2panda.org/", "\"Many of our Rust crates operate over raw bytes and are fully compatible with your own data types and any CRDT\": mutation is the CRDT's job, and p2panda carries it"] },
+		{ name = "Offline First", score = 1.0, comment = "delay tolerant, out-of-order arrival expected", sources = ["https://p2panda.org/", "\"p2panda is 'broadcast-only' at it's heart, making any data not only offline-first but also compatible with post-internet communication infrastructure, such as shortwave, packet radio, Bluetooth Low Energy, LoRa or simply a USB stick.\""] },
 	]},
 ]

@@ -32,6 +32,8 @@
 [x] `decide fmt` renumbers priorities 5 apart, keeping file order for ties
 [x] links point at a topic's directory rather than its index.html
 [x] a "?" in the masthead opening a panel on how to read the page
+[x] cite the sources behind an evaluation, so a score can be traced back
+[x] `decide fmt` warns about scored evaluations that cite no source
 ```
 
 ## data
@@ -39,6 +41,12 @@
 ### backlog
 
 ```
+[ ] earbuds topic: score the galaxy buds3 pro and moondrop space travel drafts
+[ ] earbuds topic: measure latency, the only requirement nothing is scored on
+[ ] earbuds topic: price the sony and rescore pixel buds 2 from a spec page
+[ ] ereader topic: score the likebook mars and tolino shine 3 drafts
+[ ] ereader topic: find a card slot on the boox go 7 and a use for the scribe's bluetooth, the two pages that stay quiet
+[ ] ereader topic: open one up, since nothing scores battery replaceable without a teardown
 [ ] import a topic from a spreadsheet/csv
 [ ] import a comparison table from wikipedia
 ```

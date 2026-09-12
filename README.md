@@ -20,7 +20,8 @@ each topic page has four columns:
 
 drag a requirement by its handle to reorder it or to move it between the
 first three columns. press an item to see the score behind every
-requirement, along with any comment explaining it.
+requirement, along with any comment explaining it and the sources it was
+taken from. a source that is a URL is a link, named for its site.
 
 the bookmark toggle on a requirement insists on it: items that do not fully
 meet a forced requirement are struck through and pushed down the list.
@@ -48,7 +49,7 @@ requirements = [
 
 items = [
 	{ name = "Apple", evaluations = [
-		{ name = "Sweet", score = 1.0, comment = "very sweet" },
+		{ name = "Sweet", score = 1.0, comment = "very sweet", sources = ["https://example.com/apples"] },
 		{ name = "Cheap", score = 0.5, comment = "" },
 		{ name = "Sour", score = 0.0, comment = "" },
 	]},
@@ -82,6 +83,7 @@ both layouts can be used side by side. a slug may only be defined once.
 | `items[].evaluations[].name` | must match a requirement of the same topic |
 | `items[].evaluations[].score` | 0.0 to 1.0, how well the item meets that requirement. use `-inf` for not yet evaluated |
 | `items[].evaluations[].comment` | shown when a reader expands the item |
+| `items[].evaluations[].sources` | where the score came from, cited beneath the comment. any strings: a URL, a page reference, who measured it |
 
 `decide check` validates all of this without writing anything, and names the
 file and topic behind any problem.
@@ -102,6 +104,20 @@ the order the site ranks them, sorts items by name with `skip` templates
 first, and lines each item's evaluations up with the requirements. comments
 and existing formatting are preserved, and running it twice changes
 nothing.
+
+it also warns about scores nobody can trace, every run, whether or not the
+file needed rewriting:
+
+```
+$ decide fmt
+topics/linux-distro.toml: unchanged
+topics/linux-distro.toml: warning: 2 of 24 scored evaluations have no sources
+```
+
+only real scores are counted, since an entry left `-inf` claims nothing and
+so has nothing to cite. this is a warning rather than an error: `fmt` can
+fill in a missing entry for you, but it cannot go and find a source, and
+`--check` still exits zero on it.
 
 it also renumbers `priority` in steps of 5, so there is room to drop a new
 requirement between two neighbours without renumbering the rest by hand.

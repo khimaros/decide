@@ -52,6 +52,8 @@ struct RawEvaluation {
     score: f64,
     #[serde(default)]
     comment: String,
+    #[serde(default)]
+    sources: Vec<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -83,6 +85,9 @@ pub struct Item {
 pub struct Evaluation {
     pub score: f64,
     pub comment: String,
+    /// where the score came from, in any form: a url, a page reference, a
+    /// note on who measured it. free text, so a score can be traced back.
+    pub sources: Vec<String>,
 }
 
 /// where a topic came from, which decides how the file is read and written.
@@ -275,6 +280,7 @@ fn align(
         evaluations[index] = Some(Evaluation {
             score: evaluation.score,
             comment: evaluation.comment,
+            sources: evaluation.sources,
         });
     }
     Ok(Item {
@@ -331,6 +337,25 @@ mod tests {
         assert!(evaluations[0].is_none());
         assert_eq!(evaluations[1].as_ref().unwrap().score, 0.5);
         assert_eq!(evaluations[1].as_ref().unwrap().comment, "hi");
+    }
+
+    #[test]
+    fn sources_travel_with_the_score_they_cite() {
+        let parsed = topic(
+            r#"
+            requirements = [ { name = "a", priority = 10 } ]
+            items = [
+                { name = "cited", evaluations = [
+                    { name = "a", score = 1.0, sources = ["https://example.com", "asked around"] },
+                ] },
+                { name = "uncited", evaluations = [ { name = "a", score = 1.0 } ] },
+            ]
+            "#,
+        )
+        .unwrap();
+        let sources = |index: usize| parsed.items[index].evaluations[0].as_ref().unwrap();
+        assert_eq!(sources(0).sources, ["https://example.com", "asked around"]);
+        assert!(sources(1).sources.is_empty());
     }
 
     #[test]

@@ -94,24 +94,32 @@ fn format_topics(args: &Args) -> Result<(), String> {
     let mut stale = 0;
     for report in &reports {
         let path = report.path.display();
-        if !report.changed {
+        if report.changed {
+            stale += 1;
+            if args.check {
+                println!("{path}: not canonical, run `decide fmt`");
+            } else {
+                let mut changes = Vec::new();
+                if report.added > 0 {
+                    changes.push(format!("filled in {} unevaluated", report.added));
+                }
+                if report.pruned > 0 {
+                    changes.push(format!("pruned {} orphaned", report.pruned));
+                }
+                changes.push("reordered".to_string());
+                println!("{path}: {}", changes.join(", "));
+            }
+        } else {
             println!("{path}: unchanged");
-            continue;
         }
-        stale += 1;
-        if args.check {
-            println!("{path}: not canonical, run `decide fmt`");
-            continue;
+        // a score nobody can trace is the thing this tool cannot fix for you,
+        // so it is reported every run rather than only when something changed.
+        if report.uncited > 0 {
+            println!(
+                "{path}: warning: {} of {} scored evaluations have no sources",
+                report.uncited, report.scored
+            );
         }
-        let mut changes = Vec::new();
-        if report.added > 0 {
-            changes.push(format!("filled in {} unevaluated", report.added));
-        }
-        if report.pruned > 0 {
-            changes.push(format!("pruned {} orphaned", report.pruned));
-        }
-        changes.push("reordered".to_string());
-        println!("{path}: {}", changes.join(", "));
     }
 
     if args.check && stale > 0 {

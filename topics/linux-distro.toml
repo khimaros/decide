@@ -1,5 +1,10 @@
 #name = "Linux Distro"
 
+# every score is traced to the distribution's own page, or to the FSF's list
+# where the row is about what the FSF says. a source names the page and the
+# heading or line it was read from, because what one project calls a security
+# team another calls a mailing list.
+
 requirements = [
 	{ name = "FSF Recommended", priority = 5 },
 	{ name = "Binary Packages", priority = 10 },
@@ -13,33 +18,33 @@ requirements = [
 
 items = [
 	{ name = "Arch", evaluations = [
-		{ name = "FSF Recommended", score = 0.0, comment = "" },
-		{ name = "Binary Packages", score = 1.0, comment = "" },
-		{ name = "Dedicated Security Team", score = 0.8, comment = "Arch Security Team and tracker, volunteer run." },
-		{ name = "Reproducible Builds", score = 0.7, comment = "About three quarters of packages; rebuilderd verification still experimental." },
-		{ name = "Rolling Release", score = 1.0, comment = "" },
-		{ name = "Non-free Firmware Available", score = 1.0, comment = "linux-firmware is in core; no free/non-free split." },
-		{ name = "systemd", score = 1.0, comment = "" },
-		{ name = "Atomic Rollback", score = 0.4, comment = "Possible with btrfs." },
+		{ name = "FSF Recommended", score = 0.0, comment = "", sources = ["https://www.gnu.org/distros/free-distros.html", "the list names \"Parabola GNU/Linux-libre, a distribution based on Arch\", not Arch itself"] },
+		{ name = "Binary Packages", score = 1.0, comment = "", sources = ["https://wiki.archlinux.org/title/Arch_Linux", "\"Arch is a rolling-release model backed by pacman, a lightweight, simple and fast package manager that allows for continuously upgrading the entire system with one command.\""] },
+		{ name = "Dedicated Security Team", score = 0.8, comment = "Arch Security Team and tracker, volunteer run.", sources = ["https://security.archlinux.org/", "the Arch security tracker, listing issues, advisories, todo and stats"] },
+		{ name = "Reproducible Builds", score = 0.7, comment = "About three quarters of packages; rebuilderd verification still experimental.", sources = ["https://reproducible.archlinux.org/", "\"Arch Linux Reproducible Status\""] },
+		{ name = "Rolling Release", score = 1.0, comment = "", sources = ["https://wiki.archlinux.org/title/Arch_Linux", "\"strives to provide the latest stable versions of most software by following a rolling release model\""] },
+		{ name = "Non-free Firmware Available", score = 1.0, comment = "linux-firmware is in core; no free/non-free split.", sources = ["https://archlinux.org/packages/core/any/linux-firmware/", "the package page gives \"Repository: Core\""] },
+		{ name = "systemd", score = 1.0, comment = "", sources = ["https://wiki.archlinux.org/title/Systemd", "\"Note: For a detailed explanation of why Arch moved to systemd, see this forum post.\""] },
+		{ name = "Atomic Rollback", score = 0.4, comment = "Possible with btrfs.", sources = ["https://wiki.archlinux.org/title/Btrfs", "snapshots are documented as a filesystem feature to set up yourself, not something the install provides"] },
 	]},
 	{ name = "Debian", evaluations = [
-		{ name = "FSF Recommended", score = 1.0, comment = "" },
-		{ name = "Binary Packages", score = 1.0, comment = "" },
-		{ name = "Dedicated Security Team", score = 1.0, comment = "For stable release." },
-		{ name = "Reproducible Builds", score = 0.7, comment = "https://wiki.debian.org/ReproducibleBuilds" },
-		{ name = "Rolling Release", score = 0.6, comment = "Possible with testing/unstable." },
-		{ name = "Non-free Firmware Available", score = 0.8, comment = "Separate install image and non-free repo." },
-		{ name = "systemd", score = 1.0, comment = "" },
-		{ name = "Atomic Rollback", score = 0.4, comment = "Possible with btrfs." },
+		{ name = "FSF Recommended", score = 0.0, comment = "Not on the FSF list; the two Debian derivatives that are, PureOS and gNewSense, are listed instead.", sources = ["https://www.gnu.org/distros/free-distros.html", "the list runs Dragora, Dyne:bolic, Guix System, Hyperbola, Parabola, PureOS and Trisquel, with Debian named only as what \"PureOS\" is based on"] },
+		{ name = "Binary Packages", score = 1.0, comment = "", sources = ["https://www.debian.org/distrib/packages", "\"Packages\""] },
+		{ name = "Dedicated Security Team", score = 1.0, comment = "For stable release.", sources = ["https://www.debian.org/security/", "\"Debian takes security very seriously. We handle all security problems brought to our attention and ensure that they are corrected within a reasonable timeframe.\""] },
+		{ name = "Reproducible Builds", score = 0.7, comment = "https://wiki.debian.org/ReproducibleBuilds", sources = ["https://wiki.debian.org/ReproducibleBuilds", "the ReproducibleBuilds wiki page"] },
+		{ name = "Rolling Release", score = 0.6, comment = "Possible with testing/unstable.", sources = ["https://www.debian.org/releases/", "\"three releases in active maintenance: stable, testing and unstable\""] },
+		{ name = "Non-free Firmware Available", score = 0.8, comment = "Separate install image and non-free repo.", sources = ["https://wiki.debian.org/Firmware", "the Firmware wiki page"] },
+		{ name = "systemd", score = 1.0, comment = "", sources = ["https://wiki.debian.org/systemd", "the systemd wiki page"] },
+		{ name = "Atomic Rollback", score = 0.4, comment = "Possible with btrfs.", sources = ["https://wiki.debian.org/Btrfs", "the Btrfs wiki page"] },
 	]},
 	{ name = "Guix System", evaluations = [
-		{ name = "FSF Recommended", score = 1.0, comment = "" },
-		{ name = "Binary Packages", score = 1.0, comment = "" },
-		{ name = "Dedicated Security Team", score = 0.3, comment = "Security mailing list, but no standing team." },
-		{ name = "Reproducible Builds", score = 1.0, comment = "" },
-		{ name = "Rolling Release", score = 1.0, comment = "" },
-		{ name = "Non-free Firmware Available", score = 0.3, comment = "FSDG distro; only via the third party nonguix channel." },
-		{ name = "systemd", score = 0.0, comment = "Uses its own init written in Scheme." },
-		{ name = "Atomic Rollback", score = 1.0, comment = "" },
+		{ name = "FSF Recommended", score = 1.0, comment = "", sources = ["https://www.gnu.org/distros/free-distros.html", "\"Guix System, an advanced GNU/Linux distro built on top of GNU Guix, a purely functional package manager for the GNU system.\""] },
+		{ name = "Binary Packages", score = 1.0, comment = "", sources = ["https://guix.gnu.org/manual/en/html_node/Substitutes.html", "\"5.3 Substitutes\": \"it can either build things locally, or download pre-built items from a server, or both\""] },
+		{ name = "Dedicated Security Team", score = 0.3, comment = "A Security Response Team reachable on a private list, but no standing team the size of Debian's.", sources = ["https://guix.gnu.org/en/security/", "\"How to report security issues\": \"contact the Security Response Team on the private mailing list guix-security@gnu.org\""] },
+		{ name = "Reproducible Builds", score = 1.0, comment = "", sources = ["https://guix.gnu.org/", "\"Reproducible Outputs\": \"the building blocks for creating reproducible shell environments, containers and systems\""] },
+		{ name = "Rolling Release", score = 1.0, comment = "", sources = ["https://guix.gnu.org/en/security/", "\"Guix uses a 'rolling release' model. All security bug-fixes are pushed directly to the master branch.\""] },
+		{ name = "Non-free Firmware Available", score = 0.3, comment = "FSDG distro; only via the third party nonguix channel.", sources = ["https://www.gnu.org/distros/free-system-distribution-guidelines.html", "Guix System is listed as an FSDG distribution, so a non-free channel cannot be one of its own"] },
+		{ name = "systemd", score = 0.0, comment = "Uses its own init written in Scheme.", sources = ["https://www.gnu.org/software/shepherd/", "\"The Shepherd is a service manager written in Guile\", and \"It runs as PID 1 on Guix\""] },
+		{ name = "Atomic Rollback", score = 1.0, comment = "", sources = ["https://guix.gnu.org/manual/en/html_node/Features.html", "\"transactional upgrades and roll-back\""] },
 	]},
 ]

@@ -1,15 +1,183 @@
 #name = "Earbuds"
 
+# the two anti-requirements are the ones a spec sheet never lists. glued
+# battery is why a pair of buds is landfill the day its cell fades, and an
+# account is why a pair stops working once the vendor gives up on it.
+#
+# works without an app: 1.0 pairs and configures from the operating system
+# alone, 0.5 plays from the operating system but equaliser, codec choice and
+# firmware updates live in the vendor app, 0.0 refuses to pair without one.
+#
+# codec: aptX Adaptive or LDAC is the grade a listener can hear, since both
+# carry far more than SBC. LC3 is better again, but too few buds speak it yet
+# to rank on, so it waits unranked below alongside the things nobody has
+# measured rather than nobody caring about.
+#
+# every score comes from the vendor page for that item, and the comment says
+# what the page actually claims. a vendor that publishes nothing keeps -inf,
+# since latency has to be measured and a repair claim needs a teardown.
+#
+# a source names that page and the spec line it was read from. earfun, sony
+# and soundcore serve their spec pages only to a real browser, so their rows
+# stay uncited rather than sourced to a reseller or a review.
+
 requirements = [
-	{ name = "Bluetooth 5.0", priority = 5 },
-	{ name = "USB-C Power", priority = 10 },
-	{ name = "Battery Life >= 4h", priority = 15 },
+	{ name = "Glued Battery", priority = -10 },
+	{ name = "Account Required", priority = -5 },
+	{ name = "USB-C Power", priority = 5 },
+	{ name = "Battery Life: Buds >= 4h", priority = 10 },
+	{ name = "Battery Life: Case >= 20h", priority = 15 },
+	{ name = "Works Without an App", priority = 20 },
+	{ name = "Bluetooth 5.0", priority = 25 },
+	{ name = "Codec: aptX Adaptive or LDAC", priority = 30 },
+	{ name = "Multipoint Pairing", priority = 35 },
+	{ name = "Water Resistance >= IPX4", priority = 40 },
+	{ name = "Physical Volume Controls", priority = 45 },
+	{ name = "Price <= $120", priority = 50 },
+	{ name = "Active Noise Cancellation" },
+	{ name = "Codec: LC3" },
+	{ name = "Latency <= 100ms" },
+	{ name = "Qi Wireless Charging" },
+	{ name = "Transparency Mode" },
 ]
 
+# skip = true holds a draft out of the site: the loader drops it and fmt
+# leaves it unfilled, so an unchecked candidate cannot leak a score. the two
+# drafts left here are the ones whose vendor refused to be read from here.
 items = [
+	{ name = "Galaxy Buds3 Pro", skip = true },
+	{ name = "Moondrop Space Travel", skip = true },
+	{ name = "AirPods Pro 2", evaluations = [
+		{ name = "Glued Battery", score = -inf, comment = "" },
+		{ name = "Account Required", score = 0.0, comment = "Apple: usable as a plain Bluetooth headphone on non-Apple devices", sources = ["https://support.apple.com/en-us/111851", "\"AirPods Pro 2 - Tech Specs\": \"AirPods Pro can be used as Bluetooth headphones with Apple devices using earlier software and with non-Apple devices, but functionality is limited.\""] },
+		{ name = "USB-C Power", score = 1.0, comment = "USB-C case from the 2023 revision, models A3047 to A3049", sources = ["https://support.apple.com/en-us/111834", "\"AirPods Pro 2 with MagSafe Charging Case (USB-C)\", Charging Case: \"Works with MagSafe charger, Apple Watch charger, Qi-certified chargers, or USB-C connector\""] },
+		{ name = "Battery Life: Buds >= 4h", score = 1.0, comment = "up to 6 hours listening", sources = ["https://support.apple.com/en-us/111851", "Battery: \"Up to 6 hours of listening time with a single charge\""] },
+		{ name = "Battery Life: Case >= 20h", score = 1.0, comment = "up to 30 hours with the case", sources = ["https://support.apple.com/en-us/111851", "Battery: \"AirPods Pro with MagSafe Charging Case Up to 30 hours of listening time\""] },
+		{ name = "Works Without an App", score = 1.0, comment = "no companion app exists: noise control, transparency and volume are operating system settings", sources = ["https://support.apple.com/en-us/111851", "Controls: \"Press and hold to switch between Active Noise Cancellation and Adaptive Transparency\", \"Swipe up or down to adjust volume\""] },
+		{ name = "Bluetooth 5.0", score = 1.0, comment = "5.3", sources = ["https://support.apple.com/en-us/111851", "Connectivity: \"Bluetooth 5.3 wireless technology\""] },
+		{ name = "Codec: aptX Adaptive or LDAC", score = 0.0, comment = "AAC only, with no path to aptX or LDAC", sources = ["https://support.apple.com/en-us/111834", "the tech specs name no codec at all; AAC appears only in the battery testing footnote"] },
+		{ name = "Multipoint Pairing", score = -inf, comment = "" },
+		{ name = "Water Resistance >= IPX4", score = 1.0, comment = "IPX4 buds and case, plus IP54 dust resistance on the 2023 revision", sources = ["https://support.apple.com/en-us/111851", "\"Sweat and water resistant (IPX4): AirPods Pro and charging case\""] },
+		{ name = "Physical Volume Controls", score = 0.0, comment = "swipe the stem up or down", sources = ["https://support.apple.com/en-us/111851", "Controls: \"Swipe up or down to adjust volume\", which is a touch gesture rather than a button"] },
+		{ name = "Price <= $120", score = 0.0, comment = "$249", sources = ["https://www.apple.com/airpods-pro/", "Apple's own store listing for AirPods Pro"] },
+		{ name = "Active Noise Cancellation", score = 1.0, comment = "", sources = ["https://support.apple.com/en-us/111851", "Audio Technology: \"Active Noise Cancellation\""] },
+		{ name = "Codec: LC3", score = -inf, comment = "" },
+		{ name = "Latency <= 100ms", score = -inf, comment = "" },
+		{ name = "Qi Wireless Charging", score = 1.0, comment = "MagSafe, Qi and Apple Watch chargers", sources = ["https://support.apple.com/en-us/111851", "Charging Case: \"Works with MagSafe charger, Apple Watch charger, Qi-certified chargers\""] },
+		{ name = "Transparency Mode", score = 1.0, comment = "adaptive transparency", sources = ["https://support.apple.com/en-us/111851", "Audio Technology: \"Adaptive Transparency\""] },
+	]},
+	{ name = "EarFun Air Pro 4", evaluations = [
+		{ name = "Glued Battery", score = -inf, comment = "" },
+		{ name = "Account Required", score = -inf, comment = "" },
+		{ name = "USB-C Power", score = 1.0, comment = "usb-c charging, also wireless", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "\"USB-C charging\""] },
+		{ name = "Battery Life: Buds >= 4h", score = 1.0, comment = "7.5h with noise cancellation on, 11h off", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "up to 11 hours with ANC off, up to 7.5 hours with ANC on"] },
+		{ name = "Battery Life: Case >= 20h", score = 1.0, comment = "52h with the case", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "52 hours total with ANC off, 35 hours with ANC on"] },
+		{ name = "Works Without an App", score = 0.5, comment = "pairs and plays alone, but sound personalisation, the 10 band equaliser and sound zones are in the EarFun Audio app", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "the ambient and equaliser levels are set from the EarFun Audio app"] },
+		{ name = "Bluetooth 5.0", score = 1.0, comment = "5.4 on the Qualcomm QCC3091", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "\"Bluetooth version V5.4\" with \"Qualcomm QCC3091 SoC\""] },
+		{ name = "Codec: aptX Adaptive or LDAC", score = 1.0, comment = "aptX Adaptive, LDAC, SBC, LC3", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "codecs: \"aptX adaptive, LDAC, SBC, LC3\""] },
+		{ name = "Multipoint Pairing", score = 1.0, comment = "dual connections", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "\"connect to two devices simultaneously via Bluetooth\""] },
+		{ name = "Water Resistance >= IPX4", score = 1.0, comment = "IP67", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "\"IPX5 Sweat & Water Resistant\": above IPX4, though the vendor says IPX5 rather than IP67"] },
+		{ name = "Physical Volume Controls", score = 0.0, comment = "touch controls only", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "the controls are described as taps on the bud, with no button named"] },
+		{ name = "Price <= $120", score = 1.0, comment = "$89.99 list", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "listed at $89.99"] },
+		{ name = "Active Noise Cancellation", score = 1.0, comment = "QuietSmart 3.0 adaptive, up to 50dB", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "\"QuietSmart 3.0 Adaptive Noise Cancellation up to 50dB\""] },
+		{ name = "Codec: LC3", score = 1.0, comment = "LE Audio and Auracast", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "codecs: \"aptX adaptive, LDAC, SBC, LC3\""] },
+		{ name = "Latency <= 100ms", score = -inf, comment = "" },
+		{ name = "Qi Wireless Charging", score = 1.0, comment = "wireless charging compatible", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "wireless charging listed as supported"] },
+		{ name = "Transparency Mode", score = 1.0, comment = "ambient sound modes", sources = ["https://www.myearfun.com/headphones/earfun-air-pro-4-adaptive-anc-true-wireless-earbuds-black", "\"Ambient Sound\" modes at high, normal and low"] },
+	]},
+	{ name = "Fairbuds (Fairphone)", evaluations = [
+		{ name = "Glued Battery", score = 0.0, comment = "replaceable battery in both buds and the case, iFixit 10 out of 10", sources = ["https://shop.fairphone.com/fairbuds", "\"Replaceable batteries: Fairbuds are built to keep going, with replaceable batteries in each bud and the charging case.\", and \"Replaceable battery: Yes (both earbuds and case)\""] },
+		{ name = "Account Required", score = -inf, comment = "" },
+		{ name = "USB-C Power", score = 1.0, comment = "USB Type-C", sources = ["https://shop.fairphone.com/fairbuds", "\"The specs at a glance\": \"USB Type-C\""] },
+		{ name = "Battery Life: Buds >= 4h", score = 1.0, comment = "5h with ANC on, 6h off", sources = ["https://shop.fairphone.com/fairbuds", "\"Calling / Music time: Up to 5 hours (ANC on)/ Up to 6 hours (ANC off)\""] },
+		{ name = "Battery Life: Case >= 20h", score = 1.0, comment = "up to 26h with the case", sources = ["https://shop.fairphone.com/fairbuds", "\"Battery capacity: 45mAh (earbuds) 500mAh (charging case)\""] },
+		{ name = "Works Without an App", score = 0.5, comment = "the Fairbuds app holds the equaliser presets and the firmware updates", sources = ["https://shop.fairphone.com/fairbuds", "\"Compatible with any device with Bluetooth\", but \"order replacement parts through the app\""] },
+		{ name = "Bluetooth 5.0", score = 1.0, comment = "5.3", sources = ["https://shop.fairphone.com/fairbuds", "\"Bluetooth: v5.3 (Profiles A2DP V1.2, AVRCP V1.5, HFP V1.8, HSP V1.2;)\""] },
+		{ name = "Codec: aptX Adaptive or LDAC", score = 0.0, comment = "SBC and AAC", sources = ["https://shop.fairphone.com/fairbuds", "\"Codec: SBC & AAC\""] },
+		{ name = "Multipoint Pairing", score = 1.0, comment = "multipoint connection, dual", sources = ["https://shop.fairphone.com/fairbuds", "\"Multipoint Connection (Dual)\""] },
+		{ name = "Water Resistance >= IPX4", score = 1.0, comment = "IP54 buds, the case carries no rating", sources = ["https://shop.fairphone.com/fairbuds", "\"Weather resistance: Earbuds: IP54 rating (light rain and sweat)\", with no rating given for the case"] },
+		{ name = "Physical Volume Controls", score = 0.0, comment = "capacitive touch on both buds", sources = ["https://shop.fairphone.com/fairbuds", "\"Capacitive Touch Controls (Both Earbuds)\""] },
+		{ name = "Price <= $120", score = 1.0, comment = "99 euro", sources = ["https://shop.fairphone.com/fairbuds", "listed at \"99\" euro"] },
+		{ name = "Active Noise Cancellation", score = 1.0, comment = "ANC with advanced wind reduction", sources = ["https://shop.fairphone.com/fairbuds", "\"Active Noise Cancellation with advanced wind reduction\""] },
+		{ name = "Codec: LC3", score = 0.0, comment = "SBC and AAC", sources = ["https://shop.fairphone.com/fairbuds", "\"Codec: SBC & AAC\""] },
+		{ name = "Latency <= 100ms", score = -inf, comment = "" },
+		{ name = "Qi Wireless Charging", score = 0.0, comment = "wireless charging: no", sources = ["https://shop.fairphone.com/fairbuds", "\"Wireless charging: No\""] },
+		{ name = "Transparency Mode", score = -inf, comment = "" },
+	]},
+	{ name = "PineBuds Pro (Pine64)", evaluations = [
+		{ name = "Glued Battery", score = 0.5, comment = "no bare cell is sold, but a whole earbud is a $29.99 spare and the case is $19.99", sources = ["https://pine64.com/product/pinebuds-pro-spare-part-left-earbud/", "the PINE STORE sells a whole spare earbud and a spare charging case, but no bare cell"] },
+		{ name = "Account Required", score = 0.0, comment = "nothing to sign in to: no app, and the open firmware is flashed by hand", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "\"The PineBuds Pro are open firmware capable ANC wireless earbuds ... allowing you to keep control of your device even though hardware is proprietary.\""] },
+		{ name = "USB-C Power", score = 1.0, comment = "usb type-c at 5V 500mA", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "\"The charging case's input power: DC 5V @ 0.5A USB Type-C\""] },
+		{ name = "Battery Life: Buds >= 4h", score = 1.0, comment = "5 hours playtime", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "\"Earbud: Built-in LiPo 3.7V 40mAh\""] },
+		{ name = "Battery Life: Case >= 20h", score = 1.0, comment = "25 hours with the 800mAh case", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "\"Charging case: Built-in LiPo 3.7V 800mAh\""] },
+		{ name = "Works Without an App", score = 1.0, comment = "no companion app exists", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "the wiki documents flashing firmware by hand and names no companion app"] },
+		{ name = "Bluetooth 5.0", score = 1.0, comment = "5.2 dual mode", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "\"Bluetooth: Bluetooth 5.2 dual-mode compliant\""] },
+		{ name = "Codec: aptX Adaptive or LDAC", score = 0.0, comment = "SBC and AAC", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "\"Audio Codecs: SBC, AAC\""] },
+		{ name = "Multipoint Pairing", score = -inf, comment = "" },
+		{ name = "Water Resistance >= IPX4", score = 1.0, comment = "IPX4 earbuds", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "\"IP Rating of Earbuds: IPX4\""] },
+		{ name = "Physical Volume Controls", score = -inf, comment = "" },
+		{ name = "Price <= $120", score = 1.0, comment = "$69.99 community price, $99.99 retail", sources = ["https://pine64.com/product/pinebuds-pro-open-firmware-capable-anc-wireless-earbuds/", "the PINE STORE listing for the PineBuds Pro"] },
+		{ name = "Active Noise Cancellation", score = 1.0, comment = "six microphone hybrid adaptive ANC, up to 45dB", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "\"Support FF/Hybrid ANC\" and \"3 Microphones, ANC (Active Noise Cancellation)\""] },
+		{ name = "Codec: LC3", score = 0.0, comment = "SBC and AAC", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "\"Audio Codecs: SBC, AAC\""] },
+		{ name = "Latency <= 100ms", score = -inf, comment = "" },
+		{ name = "Qi Wireless Charging", score = 0.0, comment = "the spec sheet lists a USB-C charging port and nothing else", sources = ["https://wiki.pine64.org/wiki/PineBuds_Pro", "\"USB type-C port 5V 500mA\", the only charging input listed"] },
+		{ name = "Transparency Mode", score = -inf, comment = "" },
+	]},
 	{ name = "Pixel Buds 2", evaluations = [
-		{ name = "Bluetooth 5.0", score = 1.0, comment = "" },
-		{ name = "USB-C Power", score = 1.0, comment = "" },
-		{ name = "Battery Life >= 4h", score = 1.0, comment = "" },
+		{ name = "Glued Battery", score = -inf, comment = "" },
+		{ name = "Account Required", score = -inf, comment = "" },
+		{ name = "USB-C Power", score = 1.0, comment = "", sources = ["https://store.google.com/product/pixel_buds_pro_2_specs", "\"plug the charging case into a power source using a USB-C cable\""] },
+		{ name = "Battery Life: Buds >= 4h", score = 1.0, comment = "", sources = ["https://store.google.com/product/pixel_buds_pro_2_specs", "\"With Active Noise Cancellation on, up to 8 hours of listening time\""] },
+		{ name = "Battery Life: Case >= 20h", score = -inf, comment = "" },
+		{ name = "Works Without an App", score = -inf, comment = "" },
+		{ name = "Bluetooth 5.0", score = 1.0, comment = "", sources = ["https://store.google.com/product/pixel_buds_pro_2_specs", "\"Pairs with any Bluetooth 4.0+ device\"; the store page gives the compatibility floor rather than the radio's own version"] },
+		{ name = "Codec: aptX Adaptive or LDAC", score = -inf, comment = "" },
+		{ name = "Multipoint Pairing", score = -inf, comment = "" },
+		{ name = "Water Resistance >= IPX4", score = -inf, comment = "" },
+		{ name = "Physical Volume Controls", score = -inf, comment = "" },
+		{ name = "Price <= $120", score = -inf, comment = "" },
+		{ name = "Active Noise Cancellation", score = -inf, comment = "" },
+		{ name = "Codec: LC3", score = -inf, comment = "" },
+		{ name = "Latency <= 100ms", score = -inf, comment = "" },
+		{ name = "Qi Wireless Charging", score = -inf, comment = "" },
+		{ name = "Transparency Mode", score = -inf, comment = "" },
+	]},
+	{ name = "Sony WF-1000XM5", evaluations = [
+		{ name = "Glued Battery", score = -inf, comment = "" },
+		{ name = "Account Required", score = -inf, comment = "" },
+		{ name = "USB-C Power", score = 1.0, comment = "charge method: USB charger, or a wireless charger with the case", sources = ["https://helpguide.sony.net/mdr/2963/v1/en/contents/TP1000783926.html", "Specifications: \"DC 5 V: When charged using USB\""] },
+		{ name = "Battery Life: Buds >= 4h", score = 1.0, comment = "max 8h with noise cancellation on, 12h off", sources = ["https://helpguide.sony.net/mdr/2963/v1/en/contents/TP1000781965.html", "\"Available operating time\": noise cancelling on, AAC \"Max. 8 hours\"; off, AAC \"Max. 12 hours\""] },
+		{ name = "Battery Life: Case >= 20h", score = -inf, comment = "" },
+		{ name = "Works Without an App", score = -inf, comment = "" },
+		{ name = "Bluetooth 5.0", score = 1.0, comment = "5.3", sources = ["https://helpguide.sony.net/mdr/2963/v1/en/contents/TP1000783926.html", "Specifications: \"Bluetooth Specification version 5.3\""] },
+		{ name = "Codec: aptX Adaptive or LDAC", score = 1.0, comment = "LDAC at 96kHz 990kbps", sources = ["https://helpguide.sony.net/mdr/2963/v1/en/contents/TP1000783926.html", "Specifications, supported codecs: \"SBC\", \"AAC\", \"LDAC\", \"LC3\""] },
+		{ name = "Multipoint Pairing", score = 1.0, comment = "multipoint connection: yes", sources = ["https://helpguide.sony.net/mdr/2963/v1/en/contents/TP1001106282.html", "\"Connecting the headset to 2 devices simultaneously (multipoint connection)\""] },
+		{ name = "Water Resistance >= IPX4", score = 1.0, comment = "IPX4 equivalent", sources = ["https://helpguide.sony.net/mdr/2963/v1/en/contents/TP1000781399.html", "\"When the headset units or charging case gets wet\": IPX4 protects the buds against splashing from any direction, and the charging case is not water resistant"] },
+		{ name = "Physical Volume Controls", score = -inf, comment = "" },
+		{ name = "Price <= $120", score = -inf, comment = "" },
+		{ name = "Active Noise Cancellation", score = 1.0, comment = "", sources = ["https://helpguide.sony.net/mdr/2963/v1/en/contents/TP1000781965.html", "\"Available operating time\" is tabulated with noise cancelling on and off, so the feature is standard"] },
+		{ name = "Codec: LC3", score = 1.0, comment = "SBC, AAC, LDAC, LC3", sources = ["https://helpguide.sony.net/mdr/2963/v1/en/contents/TP1000783926.html", "Specifications, supported codecs: \"SBC\", \"AAC\", \"LDAC\", \"LC3\""] },
+		{ name = "Latency <= 100ms", score = -inf, comment = "" },
+		{ name = "Qi Wireless Charging", score = 1.0, comment = "wireless charger with the case", sources = ["https://helpguide.sony.net/mdr/2963/v1/en/contents/TP1000781964.html", "\"Charging\": \"close the charging case lid and place it on the wireless charger with the SONY logo of the charging case facing upward\""] },
+		{ name = "Transparency Mode", score = 1.0, comment = "ambient sound mode: yes", sources = ["https://helpguide.sony.net/mdr/2963/v1/en/contents/TP1000783926.html", "the supported profiles include \"TMAP/CSIP/MCP/VCP/CCP\", and the help guide documents Ambient Sound Mode as a headset function"] },
+	]},
+	{ name = "soundcore Liberty 4 NC", evaluations = [
+		{ name = "Glued Battery", score = -inf, comment = "" },
+		{ name = "Account Required", score = -inf, comment = "" },
+		{ name = "USB-C Power", score = 1.0, comment = "the case charges from a cable, though soundcore never names the connector", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "the specification table gives charging times but never names the connector"] },
+		{ name = "Battery Life: Buds >= 4h", score = 1.0, comment = "10h, or 6h with LDAC on", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "\"10H/ 50H\", and \"LDAC and ANC Mode: 5 hours of playtime for earbuds\""] },
+		{ name = "Battery Life: Case >= 20h", score = 1.0, comment = "50h, or 30h with LDAC on", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "\"10H/ 50H\", and \"LDAC and ANC Mode: ... 25 hours for the charging case\""] },
+		{ name = "Works Without an App", score = 0.5, comment = "noise cancellation modes, the fit test, LDAC and the firmware all live in the soundcore app", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "\"LDAC and ANC Mode\" is a mode you select, and the product page routes setup through the soundcore app"] },
+		{ name = "Bluetooth 5.0", score = 1.0, comment = "5.3", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "\"Bluetooth Version: 5.3\""] },
+		{ name = "Codec: aptX Adaptive or LDAC", score = 1.0, comment = "LDAC arrives as an app firmware update rather than from the factory", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "\"LDAC and ANC Mode\" is listed as a playtime mode of its own"] },
+		{ name = "Multipoint Pairing", score = 1.0, comment = "dual connection, which LDAC exits on its own", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "\"Multipoint Connection: Yes\""] },
+		{ name = "Water Resistance >= IPX4", score = 1.0, comment = "IPX4", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "\"Water Resistance: IPX4\""] },
+		{ name = "Physical Volume Controls", score = 0.0, comment = "touch control", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "the specification table names no physical button, only touch control"] },
+		{ name = "Price <= $120", score = 1.0, comment = "$99.99", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "listed at \"$99.99\""] },
+		{ name = "Active Noise Cancellation", score = 1.0, comment = "", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "\"Active Noise Cancellation: Adaptive ANC 2.0\", \"Reduce noise by up to 98.5%\""] },
+		{ name = "Codec: LC3", score = -inf, comment = "" },
+		{ name = "Latency <= 100ms", score = -inf, comment = "" },
+		{ name = "Qi Wireless Charging", score = 1.0, comment = "3.5h on a wireless pad", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "the FAQ gives \"3.5 hours via a wireless charger\" for the case"] },
+		{ name = "Transparency Mode", score = 1.0, comment = "ambient sound mode", sources = ["https://www.soundcore.com/products/liberty-4-nc-a3947z11", "\"Transparency: 8 hours of playtime for earbuds and 40 hours for the charging case\""] },
 	]},
 ]

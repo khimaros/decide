@@ -3,6 +3,7 @@
 
 import json
 import os
+import re
 import shutil
 import tempfile
 import tomllib
@@ -142,6 +143,7 @@ class SiteTest(unittest.TestCase):
                 else:
                     self.assertEqual(slot['score'], evaluation['score'])
                     self.assertEqual(slot['comment'], evaluation['comment'])
+                    self.assertEqual(slot['sources'], evaluation.get('sources', []))
 
     @unittest.skipUnless(harness.CHROME, 'no chrome available')
     def test_browser_scores_and_sorts_the_items(self):
@@ -150,6 +152,19 @@ class SiteTest(unittest.TestCase):
             drawn = harness.scored_items(dom)
             self.assertEqual(
                 [(i['name'], i['total'], i['filtered']) for i in drawn], expected, slug)
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_browser_shows_what_a_score_is_based_on(self):
+        dom = harness.render(urljoin(self.base, 'topics/fruit/'))
+        apple = dom.split('>Apple<')[1].split('>Mystery<')[0]
+        self.assertIn('href="https://example.com/fruit"', apple)
+        self.assertIn('href="https://example.org/orchard"', apple,
+                      'every source should be cited, not only the first')
+        self.assertIn('>example.com</a>', apple, 'a link should be named for its site')
+
+        lemon = dom.split('>Lemon<')[1]
+        self.assertIn('sources: tasted it myself<', lemon,
+                      'a source that is not a url should stay text')
 
     @unittest.skipUnless(harness.CHROME, 'no chrome available')
     def test_browser_ranks_requirements_from_their_priority(self):
@@ -312,6 +327,52 @@ class FormatTest(unittest.TestCase):
         self.assertEqual(harness.fmt(self.data, '--prune').returncode, 0)
         self.assertNotIn('keep me', self.formatted())
 
+    def test_it_leaves_sources_with_the_score_they_cite(self):
+        self.write(
+            MESSY_TOPIC.replace(
+                '{ name = "Cheap", score = 0.25, comment = "keep me" }',
+                '{ name = "Cheap", score = 0.25, comment = "keep me", '
+                'sources = ["https://example.com/price", "the shelf label"] }',
+            )
+        )
+        self.assertEqual(harness.fmt(self.data).returncode, 0)
+        self.assertIn('sources = ["https://example.com/price", "the shelf label"]',
+                      self.formatted())
+
+        # a citation belongs to a score, so an entry filled in as unevaluated
+        # has nothing to cite and gains no sources of its own
+        self.assertNotIn('-inf, comment = "", sources', self.formatted())
+        harness.fmt(self.data)
+        self.assertIn('unchanged', harness.fmt(self.data).stdout)
+
+    def test_it_warns_about_scores_that_cite_nothing(self):
+        # the messy topic scores exactly one requirement, and cites nothing
+        result = harness.fmt(self.data)
+        self.assertEqual(result.returncode, 0)
+        self.assertIn('1 of 1 scored evaluations have no sources',
+                      result.stdout + result.stderr)
+
+        # the entries fmt fills in are unevaluated, so they are not counted
+        self.assertNotIn('of 4 scored', result.stdout + result.stderr)
+
+    def test_a_cited_score_draws_no_warning(self):
+        self.write(
+            MESSY_TOPIC.replace(
+                '{ name = "Cheap", score = 0.25, comment = "keep me" }',
+                '{ name = "Cheap", score = 0.25, comment = "keep me", '
+                'sources = ["https://example.com/price"] }',
+            )
+        )
+        result = harness.fmt(self.data)
+        self.assertEqual(result.returncode, 0)
+        self.assertNotIn('no sources', result.stdout + result.stderr)
+
+    def test_the_warning_survives_a_check_run(self):
+        # --check writes nothing, but CI should still hear about it
+        result = harness.fmt(self.data, '--check')
+        self.assertIn('scored evaluations have no sources',
+                      result.stdout + result.stderr)
+
     def test_a_formatted_topic_still_builds(self):
         harness.fmt(self.data)
         output = os.path.join(self.tmp.name, 'site')
@@ -376,6 +437,85 @@ class PrioritySpacingTest(unittest.TestCase):
         result = harness.fmt(self.data)
         self.assertEqual(harness.read(self.topic), once)
         self.assertIn('unchanged', result.stdout)
+
+
+SOURCES_TOPIC = '''name = "Sources"
+
+requirements = [ { name = "Sweet", priority = 10 } ]
+
+items = [
+\t{ name = "Awkward", evaluations = [ { name = "Sweet", score = 1.0, comment = "", sources = ["javascript:alert(1)"] } ] },
+\t{ name = "Bare", evaluations = [ { name = "Sweet", score = 1.0, comment = "" } ] },
+\t{ name = "Empty", evaluations = [ { name = "Sweet", score = 1.0, comment = "", sources = [] } ] },
+\t{ name = "Mixed", evaluations = [ { name = "Sweet", score = 1.0, comment = "", sources = ["https://example.com/review", "a friend told me"] } ] },
+\t{ name = "Prose", evaluations = [ { name = "Sweet", score = 1.0, comment = "", sources = ["tasted it myself"] } ] },
+]
+'''
+
+
+class SourcesTest(unittest.TestCase):
+    """sources cite where a score came from. they should read as citations,
+    and only ever be followable when a source is a url a browser may follow."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        data = os.path.join(cls.tmp.name, 'data')
+        os.makedirs(os.path.join(data, 'topics'))
+        with open(os.path.join(data, 'topics', 'sources.toml'), 'w') as f:
+            f.write(SOURCES_TOPIC)
+
+        cls.output = os.path.join(cls.tmp.name, SITE_DIR)
+        result = harness.build(cls.output, data=data)
+        if result.returncode != 0:
+            raise AssertionError('build failed:\n%s%s' % (result.stdout, result.stderr))
+        cls.server = harness.WebServer(cls.tmp.name).__enter__()
+        cls.page = urljoin(cls.server.url, '%s/topics/sources/' % SITE_DIR)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.__exit__(None, None, None)
+        cls.tmp.cleanup()
+
+    def cards(self):
+        return harness.item_cards(harness.render(self.page))
+
+    def test_sources_reach_the_published_data(self):
+        topic = harness.load_json(os.path.join(self.output, 'topics', 'sources', 'topic.json'))
+        cited = {i['name']: i['evaluations'][0]['sources'] for i in topic['items']}
+        self.assertEqual(cited['Mixed'], ['https://example.com/review', 'a friend told me'])
+        self.assertEqual(cited['Prose'], ['tasted it myself'])
+        self.assertEqual(cited['Awkward'], ['javascript:alert(1)'])
+        self.assertEqual(cited['Bare'], [], 'an uncited score still carries the field')
+        self.assertEqual(cited['Empty'], [])
+
+    def test_a_source_that_is_not_a_string_is_rejected(self):
+        data = os.path.join(self.tmp.name, 'broken')
+        os.makedirs(os.path.join(data, 'topics'), exist_ok=True)
+        with open(os.path.join(data, 'topics', 'sources.toml'), 'w') as f:
+            f.write(SOURCES_TOPIC.replace('["tasted it myself"]', '[7]'))
+
+        result = harness.check(data)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('sources', result.stderr)
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_only_a_url_source_becomes_a_link(self):
+        cards = self.cards()
+        self.assertIn('href="https://example.com/review"', cards['Mixed'])
+        self.assertIn('>example.com</a>', cards['Mixed'], 'a link should be named for its site')
+        self.assertIn('a friend told me<', cards['Mixed'], 'every source is cited, url or not')
+        self.assertIn('sources: tasted it myself<', cards['Prose'])
+        self.assertIn('sources: javascript:alert(1)<', cards['Awkward'], 'a citation is text')
+        for href in re.findall(r'\bhref="([^"]*)"', ''.join(cards.values())):
+            self.assertFalse(href.lower().startswith('javascript:'),
+                             '%s would run script when followed' % href)
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_an_uncited_score_says_nothing_about_sources(self):
+        cards = self.cards()
+        for name in ('Bare', 'Empty'):
+            self.assertNotIn('sources:', cards[name], name)
 
 
 # drives a real drag and reports where the cards sat before it started and

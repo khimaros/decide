@@ -125,16 +125,26 @@ def probe_result(dom):
     return json.loads(text)
 
 
+def item_listing(dom):
+    """the markup the browser drew inside the suggested items list."""
+    listing = re.search(r'<ul class="list" id="items">(.*?)</ul>', dom, re.S)
+    return listing.group(1) if listing else ''
+
+
 def scored_items(dom):
     """the item names and totals the browser drew, in the order drawn."""
-    listing = re.search(r'<ul class="list" id="items">(.*?)</ul>', dom, re.S)
-    if not listing:
-        return []
     pattern = r'<li class="(list-item item[^"]*)">([^<]*)<span class="badge">([^<]*)</span>'
     return [
         {'name': name.strip(), 'total': int(total), 'filtered': 'filtered' in classes}
-        for classes, name, total in re.findall(pattern, listing.group(1))
+        for classes, name, total in re.findall(pattern, item_listing(dom))
     ]
+
+
+def item_cards(dom):
+    """each drawn item card keyed by its name, so a test can look at one card
+    without depending on where the ranking put it."""
+    cards = item_listing(dom).split('<li class="list-item item')[1:]
+    return {card.split('">', 1)[1].split('<', 1)[0].strip(): card for card in cards}
 
 
 def read(path):

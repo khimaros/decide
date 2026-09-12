@@ -4,6 +4,8 @@
 export interface Evaluation {
   score: number;
   comment: string;
+  // where the score came from, in any form, empty when nothing was cited.
+  sources: string[];
 }
 
 export interface Requirement {

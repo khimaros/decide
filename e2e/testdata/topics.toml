@@ -11,14 +11,14 @@ requirements = [
 
 items = [
 	{ name = "Apple", evaluations = [
-		{ name = "Sweet", score = 1.0, comment = "very sweet" },
+		{ name = "Sweet", score = 1.0, comment = "very sweet", sources = ["https://example.com/fruit", "https://example.org/orchard"] },
 		{ name = "Cheap", score = 0.5, comment = "" },
 		{ name = "Sour", score = 0.0, comment = "" },
 	]},
 	{ name = "Lemon", evaluations = [
 		{ name = "Sweet", score = 0.0, comment = "" },
 		{ name = "Cheap", score = 1.0, comment = "" },
-		{ name = "Sour", score = 1.0, comment = "unmistakably sour" },
+		{ name = "Sour", score = 1.0, comment = "unmistakably sour", sources = ["tasted it myself"] },
 	]},
 	{ name = "Mystery", evaluations = [
 		{ name = "Sweet", score = -inf, comment = "" },

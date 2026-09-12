@@ -38,6 +38,13 @@ orphaned evaluations are refused rather than deleted, because they hold
 scores and hand-written comments that a renamed requirement should not
 quietly discard.
 
+it also counts the scores that cite no source and warns about them on every
+run. that count is the one thing in the file the formatter deliberately will
+not fix: it can write a missing entry, but finding a source is research, not
+formatting. so it is a warning rather than an error, and `--check` still
+exits zero on it, which keeps CI honest about canonical shape without
+blocking on a backlog of citations.
+
 ## the page
 
 a topic's data is published beside its page as `topic.json`, and the page
@@ -81,6 +88,19 @@ with `null` where nothing is known. the alternative, keying by requirement
 name or by a synthetic id, costs a lookup table in the page and repeats
 every requirement name once per item. positions are assigned by the
 generator, which also owns the requirement order, so the two cannot drift.
+
+## why a source is free text
+
+an evaluation's `sources` are the references behind its score, and they are
+plain strings because that is what a reference actually looks like: a URL
+for some, a page number, a model name, or who measured it for others.
+constraining the field to URLs would leave the rest uncited.
+
+the page decides what to do with each one at draw time. a source parses as
+an `http` or `https` URL becomes a link named for its host; everything else
+is drawn as text. that check is what keeps a `javascript:` source, or any
+other scheme, from becoming something a reader can click, and it is a
+property the end to end tests assert directly against the rendered DOM.
 
 ## why every URL is relative
 

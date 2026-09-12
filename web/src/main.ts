@@ -10,6 +10,14 @@ import type { Item, Requirement, Topic } from "./types";
 const GOOD = 0.7;
 const FAIR = 0.3;
 
+// how the sources behind a score are introduced and separated.
+const SOURCES_LABEL = "sources: ";
+const SOURCES_SEPARATOR = ", ";
+
+// the only schemes a citation is turned into a link for. a source is free
+// text, so anything else stays text rather than becoming something to click.
+const FOLLOWABLE = ["http:", "https:"];
+
 // bootstrap icons, MIT licensed.
 const HANDLE_ICON =
   '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>';
@@ -111,6 +119,37 @@ function toneOf(score: number | undefined, anti: boolean): string {
   return "score-poor";
 }
 
+// a citation is only worth following when it is a url a browser can open.
+// anything else is a note, and is named rather than linked.
+function sourceLink(source: string): HTMLAnchorElement | null {
+  let url: URL;
+  try {
+    url = new URL(source);
+  } catch {
+    return null;
+  }
+  if (!FOLLOWABLE.includes(url.protocol)) return null;
+
+  const link = document.createElement("a");
+  link.href = source;
+  link.textContent = url.hostname.replace(/^www\./, "");
+  link.title = source;
+  link.target = "_blank";
+  link.rel = "noreferrer";
+  return link;
+}
+
+function sourcesElement(sources: string[]): HTMLParagraphElement {
+  const cited = document.createElement("p");
+  cited.className = "detail-sources";
+  cited.append(SOURCES_LABEL);
+  sources.forEach((source, index) => {
+    if (index) cited.append(SOURCES_SEPARATOR);
+    cited.append(sourceLink(source) ?? source);
+  });
+  return cited;
+}
+
 function detailRow(item: Item, index: number, anti: boolean): HTMLDivElement {
   const evaluation = item.evaluations[index] ?? undefined;
   const row = document.createElement("div");
@@ -127,6 +166,9 @@ function detailRow(item: Item, index: number, anti: boolean): HTMLDivElement {
     comment.className = "detail-comment";
     comment.textContent = evaluation.comment;
     row.append(comment);
+  }
+  if (evaluation?.sources.length) {
+    row.append(sourcesElement(evaluation.sources));
   }
   return row;
 }

@@ -347,11 +347,26 @@ main {
   background: rgba(0, 0, 0, 0.35);
 }
 
-.detail-comment {
+.detail-comment,
+.detail-sources {
   margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+}
+
+/* only the first note under a score is ruled off from it, so a comment and
+   the sources behind it read as one block rather than two. */
+.detail-row > p:first-of-type {
   padding-top: 0.5rem;
   border-top: 1px solid var(--line);
-  font-size: 0.85rem;
+}
+
+.detail-sources {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.detail-sources a {
+  color: inherit;
 }
 
 .score-good {

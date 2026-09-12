@@ -26,6 +26,8 @@ const EVALUATIONS: &str = "evaluations";
 const NAME: &str = "name";
 const PRIORITY: &str = "priority";
 const SKIP: &str = "skip";
+const SCORE: &str = "score";
+const SOURCES: &str = "sources";
 
 /// indentation for entries added to an array that has none to copy.
 const NESTED_INDENT: &str = "\n\t\t";
@@ -49,6 +51,12 @@ pub struct Report {
     pub added: usize,
     pub pruned: usize,
     pub changed: bool,
+    /// evaluations carrying a real score, which are the ones a source can be
+    /// asked for. an unevaluated entry is excluded: it cites nothing because
+    /// it claims nothing.
+    pub scored: usize,
+    /// how many of those name no source.
+    pub uncited: usize,
 }
 
 /// bring every topic file below `root` into canonical shape.
@@ -221,7 +229,32 @@ fn fill_item(
             .and_then(|name| rank.get(name.as_str()).copied())
             .unwrap_or(usize::MAX)
     });
+
+    for value in evaluations.iter().filter(|value| is_scored(value)) {
+        report.scored += 1;
+        if !is_cited(value) {
+            report.uncited += 1;
+        }
+    }
     Ok(())
+}
+
+/// an entry nobody has scored claims nothing, so it is not asked for a source.
+fn is_scored(value: &Value) -> bool {
+    field(value, SCORE)
+        .and_then(Value::as_float)
+        .is_some_and(f64::is_finite)
+}
+
+/// an empty list is not a citation, and neither is a list of empty strings.
+fn is_cited(value: &Value) -> bool {
+    field(value, SOURCES)
+        .and_then(Value::as_array)
+        .is_some_and(|sources| {
+            sources
+                .iter()
+                .any(|source| source.as_str().is_some_and(|text| !text.trim().is_empty()))
+        })
 }
 
 /// an entry for a requirement nobody has scored, written the way the topics
@@ -405,6 +438,56 @@ mod tests {
         let (twice, report) = run(&once, &OPTIONS).unwrap();
         assert_eq!(once, twice);
         assert_eq!(report.added, 0);
+    }
+
+    #[test]
+    fn scores_without_sources_are_counted() {
+        let (_, report) = run(
+            "requirements = [\n\t{ name = \"A\", priority = 10 },\n\t{ name = \"B\", priority = 20 },\n]\n\
+             items = [\n\t{ name = \"one\", evaluations = [\n\
+             \t\t{ name = \"A\", score = 1.0, comment = \"\", sources = [\"https://example.com\"] },\n\
+             \t\t{ name = \"B\", score = 0.5, comment = \"\" },\n\t]},\n]\n",
+            &OPTIONS,
+        )
+        .unwrap();
+        assert_eq!(report.scored, 2);
+        assert_eq!(report.uncited, 1);
+    }
+
+    #[test]
+    fn an_unevaluated_entry_has_nothing_to_cite() {
+        let (_, report) = run(
+            "requirements = [\n\t{ name = \"A\", priority = 10 },\n\t{ name = \"B\", priority = 20 },\n]\n\
+             items = [\n\t{ name = \"one\", evaluations = [\n\t\t{ name = \"A\", score = -inf, comment = \"\" },\n\t]},\n]\n",
+            &OPTIONS,
+        )
+        .unwrap();
+        assert_eq!(report.added, 1, "B should have been filled in");
+        assert_eq!(report.scored, 0);
+        assert_eq!(report.uncited, 0);
+    }
+
+    #[test]
+    fn an_empty_sources_list_does_not_count_as_a_citation() {
+        let (_, report) = run(
+            "requirements = [\n\t{ name = \"A\", priority = 10 },\n]\n\
+             items = [\n\t{ name = \"one\", evaluations = [\n\t\t{ name = \"A\", score = 1.0, comment = \"\", sources = [] },\n\t]},\n]\n",
+            &OPTIONS,
+        )
+        .unwrap();
+        assert_eq!(report.uncited, 1);
+    }
+
+    #[test]
+    fn a_skipped_item_is_not_counted() {
+        let (_, report) = run(
+            "requirements = [\n\t{ name = \"A\", priority = 10 },\n]\n\
+             items = [\n\t{ name = \"template\", skip = true, evaluations = [\n\t\t{ name = \"A\", score = 1.0, comment = \"\" },\n\t]},\n]\n",
+            &OPTIONS,
+        )
+        .unwrap();
+        assert_eq!(report.scored, 0);
+        assert_eq!(report.uncited, 0);
     }
 
     #[test]
