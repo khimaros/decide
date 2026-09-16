@@ -50,3 +50,9 @@
 [ ] import a topic from a spreadsheet/csv
 [ ] import a comparison table from wikipedia
 ```
+
+### complete
+
+```
+[x] claw-harness topic: the notable openclaw-style assistants and every rust one from awesome-claws
+```
