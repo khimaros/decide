@@ -652,3 +652,53 @@ class DragTest(unittest.TestCase):
             found['during'], found['settled'],
             'cards moved while a requirement was in flight at %s: %s -> %s'
             % (found['viewport'], found['settled'], found['during']))
+
+
+class ShippedTopicsTest(unittest.TestCase):
+    """the shipped topics are the product, so a requirement a reader is meant
+    to rank has to reach the page with a cited score behind it for every
+    item. an unrated or uncited row reads as an answer rather than a gap."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.output = os.path.join(cls.tmp.name, SITE_DIR)
+        result = harness.build(cls.output, data=harness.ROOT)
+        if result.returncode != 0:
+            raise AssertionError('build failed:\n%s%s' % (result.stdout, result.stderr))
+        cls.server = harness.WebServer(cls.tmp.name).__enter__()
+        cls.topic = harness.load_json(
+            os.path.join(cls.output, 'topics', 'ai-harness', 'topic.json'))
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.__exit__(None, None, None)
+        cls.tmp.cleanup()
+
+    def rank(self, name):
+        ranks = {r['name']: i for i, r in enumerate(self.topic['requirements'])}
+        self.assertIn(name, ranks, 'no requirement named %s' % name)
+        return ranks[name]
+
+    def test_every_harness_is_scored_on_mobile_access(self):
+        rank = self.rank('Mobile UI')
+        for item in self.topic['items']:
+            self.assertIsNotNone(item['evaluations'][rank],
+                                 '%s leaves mobile access unrated' % item['name'])
+
+    def test_every_mobile_access_score_cites_a_source(self):
+        rank = self.rank('Mobile UI')
+        for item in self.topic['items']:
+            evaluation = item['evaluations'][rank]
+            if evaluation is None:
+                continue
+            self.assertTrue(evaluation['sources'],
+                            '%s scores mobile access without citing a source' % item['name'])
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_a_reader_can_rank_mobile_access(self):
+        page = urljoin(self.server.url, '%s/topics/ai-harness/' % SITE_DIR)
+        dom = harness.render(page)
+        listed = re.search(r'<ul class="list sortable" id="requirements">(.*?)</ul>', dom, re.S)
+        self.assertTrue(listed, 'the requirements list never rendered')
+        self.assertIn('Mobile UI', listed.group(1))
