@@ -722,13 +722,13 @@ class ShippedHarnessTopicsTest(ShippedTopic, unittest.TestCase):
         self.assertIn('Mobile UI', listed.group(1))
 
 
-class ShippedAdeTopicTest(ShippedTopic, unittest.TestCase):
+class ShippedHarnessOrchestratorTopicTest(ShippedTopic, unittest.TestCase):
     """an ADE is chosen for how far it reaches and what it will drive, so the
     rows the product owner asked for are the ones a reader has to be able to
     rank for every item: who runs the project, how you talk to it, how it
     isolates the work, which surfaces ship, and which harnesses it fronts."""
 
-    slug = 'ade'
+    slug = 'harness-orchestrator'
 
     # the axes a reader was said they want to rank on, in the words the topic
     # uses for them.

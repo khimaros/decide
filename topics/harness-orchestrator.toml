@@ -1,6 +1,6 @@
-#name = "ADE"
+#name = "Harness Orchestrator"
 
-# an ADE, in the sense orca names itself with, is the surface a developer
+# a harness orchestrator is the surface a developer
 # drives coding agents from: it launches the harnesses, holds the worktrees,
 # shows the diffs, and reaches all of it from a phone. the harnesses
 # themselves are compared in the ai-harness topic and appear here only as
