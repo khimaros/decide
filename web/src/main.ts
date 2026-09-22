@@ -25,6 +25,9 @@ const HANDLE_ICON =
 const FORCE_ICON =
   '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/><path d="M8 4a.5.5 0 0 1 .5.5V6H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V7H6a.5.5 0 0 1 0-1h1.5V4.5A.5.5 0 0 1 8 4z"/></svg>';
 
+const GRADE_ICON =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533z"/><path d="M9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>';
+
 const FORCE_ICON_ON =
   '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5zm6.5-11a.5.5 0 0 0-1 0V6H6a.5.5 0 0 0 0 1h1.5v1.5a.5.5 0 0 0 1 0V7H10a.5.5 0 0 0 0-1H8.5V4.5z"/></svg>';
 
@@ -88,6 +91,31 @@ function setForced(button: HTMLElement, on: boolean): void {
   button.innerHTML = on ? FORCE_ICON_ON : FORCE_ICON;
 }
 
+// the rule a score was graded by, folded under the requirement it explains so
+// that reading a list of names stays cheaper than reading the rules behind it.
+function rubricElement(text: string): HTMLParagraphElement {
+  const rubric = document.createElement("p");
+  rubric.className = "rubric";
+  rubric.setAttribute("hidden", "");
+  rubric.textContent = text;
+  return rubric;
+}
+
+function gradeButton(rubric: HTMLElement): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "grade";
+  button.title = "how this requirement was graded";
+  button.setAttribute("aria-expanded", "false");
+  button.innerHTML = GRADE_ICON;
+  button.addEventListener("click", () => {
+    const open = rubric.hasAttribute("hidden");
+    rubric.toggleAttribute("hidden", !open);
+    button.setAttribute("aria-expanded", String(open));
+  });
+  return button;
+}
+
 function requirementElement(requirement: Requirement, index: number): HTMLLIElement {
   const li = document.createElement("li");
   li.className = "list-item";
@@ -108,6 +136,10 @@ function requirementElement(requirement: Requirement, index: number): HTMLLIElem
   });
 
   li.append(handle, requirement.name, force);
+  if (requirement.rubric) {
+    const rubric = rubricElement(requirement.rubric);
+    li.append(gradeButton(rubric), rubric);
+  }
   return li;
 }
 

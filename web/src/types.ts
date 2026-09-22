@@ -14,6 +14,8 @@ export interface Requirement {
   // reader is expected to rank it themselves.
   priority: number | null;
   force: boolean;
+  // how a score here was graded, null when the topic says nothing about it.
+  rubric: string | null;
 }
 
 export interface Item {

@@ -24,7 +24,9 @@ requirement, along with any comment explaining it and the sources it was
 taken from. a source that is a URL is a link, named for its site.
 
 the bookmark toggle on a requirement insists on it: items that do not fully
-meet a forced requirement are struck through and pushed down the list.
+meet a forced requirement are struck through and pushed down the list. a
+requirement that was graded against a written rule carries an info button, and
+pressing it opens the rule.
 
 the same explanation is a click away on the site itself, behind the **?** in
 the top right of every page.
@@ -78,6 +80,7 @@ both layouts can be used side by side. a slug may only be defined once.
 | `requirements[].name` | unique within the topic, referenced by evaluations |
 | `requirements[].priority` | starting rank, ascending. negative starts the requirement in the anti-requirements column, absent starts it in non-requirements |
 | `requirements[].force` | start with the requirement forced on |
+| `requirements[].rubric` | how a score here was graded, opened on the page behind an info button |
 | `items[].name` | unique within the topic |
 | `items[].skip` | leave the item out of the site, for templates and drafts |
 | `items[].evaluations[].name` | must match a requirement of the same topic |

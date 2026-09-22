@@ -102,6 +102,18 @@ is drawn as text. that check is what keeps a `javascript:` source, or any
 other scheme, from becoming something a reader can click, and it is a
 property the end to end tests assert directly against the rendered DOM.
 
+## why a rubric is data
+
+how a score was graded used to live in a comment at the top of a topic file,
+where the only reader who met it was whoever opened the file. a rule that
+explains what a 0.7 was worth is part of the answer, so it rides with the
+requirement it grades, reaches `topic.json`, and the page folds it behind an
+info button rather than adding a paragraph to every row.
+
+keeping it in the data is also what lets the tests ask for it. an end to end
+test can insist that the requirements graded by a rule carry one, which a
+comment can never be held to.
+
 ## why every URL is relative
 
 a project page lives under `https://<user>.github.io/<repo>/`, so a root

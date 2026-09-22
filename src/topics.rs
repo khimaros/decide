@@ -35,6 +35,7 @@ struct RawRequirement {
     priority: Option<i64>,
     #[serde(default)]
     force: bool,
+    rubric: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -71,6 +72,9 @@ pub struct Requirement {
     /// requirements the reader is expected to rank themselves.
     pub priority: Option<i64>,
     pub force: bool,
+    /// how a score on this requirement was graded, so a reader can tell a 0.7
+    /// that means "almost" from one that means "half of it is vaporware".
+    pub rubric: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -222,6 +226,7 @@ fn convert(slug: String, raw: RawTopic) -> Result<Topic, String> {
             name: r.name,
             priority: r.priority,
             force: r.force,
+            rubric: r.rubric,
         })
         .collect();
     requirements.sort_by_key(|r| priority_key(r.priority));
@@ -317,6 +322,24 @@ mod tests {
             .map(|r| r.name.as_str())
             .collect();
         assert_eq!(order, ["first", "second", "third", "unranked"]);
+    }
+
+    #[test]
+    fn a_rubric_travels_with_the_requirement_it_grades() {
+        let parsed = topic(
+            r#"
+            requirements = [
+                { name = "graded", priority = 10, rubric = "1.0 ships it, 0.0 does not." },
+                { name = "plain", priority = 20 },
+            ]
+            "#,
+        )
+        .unwrap();
+        assert_eq!(
+            parsed.requirements[0].rubric.as_deref(),
+            Some("1.0 ships it, 0.0 does not.")
+        );
+        assert_eq!(parsed.requirements[1].rubric, None);
     }
 
     #[test]

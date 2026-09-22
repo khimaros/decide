@@ -654,10 +654,11 @@ class DragTest(unittest.TestCase):
             % (found['viewport'], found['settled'], found['during']))
 
 
-class ShippedTopicsTest(unittest.TestCase):
-    """the shipped topics are the product, so a requirement a reader is meant
-    to rank has to reach the page with a cited score behind it for every
-    item. an unrated or uncited row reads as an answer rather than a gap."""
+class ShippedTopic:
+    """builds the shipped topics into a served site, for a class that wants to
+    read one topic back out of the published data."""
+
+    slug = ''
 
     @classmethod
     def setUpClass(cls):
@@ -668,7 +669,7 @@ class ShippedTopicsTest(unittest.TestCase):
             raise AssertionError('build failed:\n%s%s' % (result.stdout, result.stderr))
         cls.server = harness.WebServer(cls.tmp.name).__enter__()
         cls.topic = harness.load_json(
-            os.path.join(cls.output, 'topics', 'ai-harness', 'topic.json'))
+            os.path.join(cls.output, 'topics', cls.slug, 'topic.json'))
 
     @classmethod
     def tearDownClass(cls):
@@ -679,6 +680,23 @@ class ShippedTopicsTest(unittest.TestCase):
         ranks = {r['name']: i for i, r in enumerate(self.topic['requirements'])}
         self.assertIn(name, ranks, 'no requirement named %s' % name)
         return ranks[name]
+
+    def unscored(self, name):
+        rank = self.rank(name)
+        return [i['name'] for i in self.topic['items'] if i['evaluations'][rank] is None]
+
+    def uncited(self, name):
+        rank = self.rank(name)
+        return [i['name'] for i in self.topic['items']
+                if i['evaluations'][rank] is not None and not i['evaluations'][rank]['sources']]
+
+
+class ShippedHarnessTopicsTest(ShippedTopic, unittest.TestCase):
+    """the shipped topics are the product, so a requirement a reader is meant
+    to rank has to reach the page with a cited score behind it for every
+    item. an unrated or uncited row reads as an answer rather than a gap."""
+
+    slug = 'ai-harness'
 
     def test_every_harness_is_scored_on_mobile_access(self):
         rank = self.rank('Mobile UI')
@@ -702,3 +720,200 @@ class ShippedTopicsTest(unittest.TestCase):
         listed = re.search(r'<ul class="list sortable" id="requirements">(.*?)</ul>', dom, re.S)
         self.assertTrue(listed, 'the requirements list never rendered')
         self.assertIn('Mobile UI', listed.group(1))
+
+
+class ShippedAdeTopicTest(ShippedTopic, unittest.TestCase):
+    """an ADE is chosen for how far it reaches and what it will drive, so the
+    rows the product owner asked for are the ones a reader has to be able to
+    rank for every item: who runs the project, how you talk to it, how it
+    isolates the work, which surfaces ship, and which harnesses it fronts."""
+
+    slug = 'ade'
+
+    # the axes a reader was said they want to rank on, in the words the topic
+    # uses for them.
+    ASKED_FOR = (
+        'Community Run',
+        'Voice: Dictation',
+        'Voice: Speech',
+        'Voice: Conversation',
+        'Git Worktrees',
+        'Web UI',
+        'iOS App',
+        'Android App',
+        'Desktop: Linux',
+        'Browser Control',
+        'Sandboxing',
+        'Harness: Pi',
+        'Harness: OpenCode',
+        'Harness: Claude Code',
+        'Harness: ACP',
+    )
+
+    def test_every_ade_is_scored_on_what_it_was_asked_for(self):
+        for name in self.ASKED_FOR:
+            self.assertEqual([], self.unscored(name), '%s is a gap' % name)
+
+    def test_every_ade_score_cites_a_source(self):
+        for name in self.ASKED_FOR:
+            self.assertEqual([], self.uncited(name), '%s cites nothing' % name)
+
+    def test_the_topic_lists_the_ades_a_reader_compares_today(self):
+        named = {i['name'] for i in self.topic['items']}
+        for adequate in ('Orca', 'T3 Code', 'Paseo'):
+            self.assertIn(adequate, named)
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_a_reader_can_rank_how_an_ade_talks_back(self):
+        page = urljoin(self.server.url, '%s/topics/%s/' % (SITE_DIR, self.slug))
+        dom = harness.render(page)
+        listed = re.search(r'<ul class="list sortable" id="requirements">(.*?)</ul>', dom, re.S)
+        self.assertTrue(listed, 'the requirements list never rendered')
+        for name in ('Voice: Conversation', 'Sandboxing'):
+            self.assertIn(name, listed.group(1))
+
+    def test_the_rows_that_are_graded_by_a_rule_carry_it(self):
+        # these are the requirements where a README lie is cheapest, so the
+        # rule a score was reached by has to reach the reader too.
+        graded = (
+            'Community Run',
+            'Voice: Dictation',
+            'Voice: Speech',
+            'Voice: Conversation',
+            'Web UI',
+            'iOS App',
+            'Android App',
+            'Harness: Any CLI',
+            'Harness: ACP',
+            'Browser Control',
+            'Sandboxing',
+        )
+        for requirement in self.topic['requirements']:
+            if requirement['name'] in graded:
+                self.assertTrue(requirement['rubric'],
+                                '%s is graded by a rule nobody is told' % requirement['name'])
+
+
+RUBRIC_TOPIC = '''name = "Rubrics"
+
+requirements = [
+\t{ name = "Sweet", priority = 10, rubric = "1.0 tastes of sugar on its own, 0.0 of nothing at all." },
+\t{ name = "Cheap", priority = 15 },
+]
+
+items = [
+\t{ name = "Apple", evaluations = [
+\t\t{ name = "Sweet", score = 1.0, comment = "" },
+\t\t{ name = "Cheap", score = 0.5, comment = "" },
+\t]},
+]
+'''
+
+# presses the button a graded requirement carries and reports what a reader
+# would see either side of it, since a rule nobody can open is a comment in a
+# source file rather than part of the answer.
+RUBRIC_PROBE = r"""
+(function () {
+  var out = document.createElement('pre');
+  out.id = 'probe';
+  out.textContent = '{}';
+  document.body.appendChild(out);
+
+  function report(o) { out.textContent = JSON.stringify(o); }
+
+  function state(button, rubric) {
+    return {
+      hidden: rubric.hasAttribute('hidden'),
+      expanded: button.getAttribute('aria-expanded'),
+      shown: !!(rubric.offsetWidth || rubric.offsetHeight)
+    };
+  }
+
+  var tries = 0;
+  function run() {
+    var button = document.querySelector('#requirements .list-item .grade');
+    if (!button) {
+      if (++tries > 100) report({error: 'no grade button was ever drawn'});
+      else setTimeout(run, 20);
+      return;
+    }
+    var rubric = button.parentElement.querySelector('.rubric');
+    if (!rubric) { report({error: 'the row behind the grade button carries no rubric'}); return; }
+
+    var before = state(button, rubric);
+    button.click();
+    var opened = state(button, rubric);
+    button.click();
+    report({
+      before: before,
+      opened: opened,
+      closed: state(button, rubric),
+      text: rubric.textContent.trim(),
+      rows: document.querySelectorAll('#requirements .list-item').length,
+      buttons: document.querySelectorAll('#requirements .grade').length
+    });
+  }
+
+  run();
+})();
+"""
+
+
+class RubricTest(unittest.TestCase):
+    """how a score was graded is part of the score, so a requirement that was
+    graded by a rule has to hand that rule to the reader."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        data = os.path.join(cls.tmp.name, 'data')
+        os.makedirs(os.path.join(data, 'topics'))
+        with open(os.path.join(data, 'topics', 'rubrics.toml'), 'w') as f:
+            f.write(RUBRIC_TOPIC)
+
+        cls.output = os.path.join(cls.tmp.name, SITE_DIR)
+        result = harness.build(cls.output, data=data)
+        if result.returncode != 0:
+            raise AssertionError('build failed:\n%s%s' % (result.stdout, result.stderr))
+        harness.probe(os.path.join(cls.output, 'topics', 'rubrics', 'index.html'), RUBRIC_PROBE)
+        cls.server = harness.WebServer(cls.tmp.name).__enter__()
+        cls.page = urljoin(cls.server.url, '%s/topics/rubrics/' % SITE_DIR)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.__exit__(None, None, None)
+        cls.tmp.cleanup()
+
+    def test_a_rubric_reaches_the_published_data(self):
+        topic = harness.load_json(os.path.join(self.output, 'topics', 'rubrics', 'topic.json'))
+        rubrics = {r['name']: r['rubric'] for r in topic['requirements']}
+        self.assertEqual(rubrics['Sweet'],
+                         '1.0 tastes of sugar on its own, 0.0 of nothing at all.')
+        self.assertIsNone(rubrics['Cheap'], 'a requirement with no rule says nothing about one')
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_only_a_graded_requirement_offers_a_button(self):
+        dom = harness.render(self.page)
+        found = harness.probe_result(dom)
+        self.assertNotIn('error', found, found)
+        self.assertEqual(found['rows'], 2, 'both requirements should be listed')
+        self.assertEqual(found['buttons'], 1, 'only the requirement with a rule is graded')
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_a_reader_can_open_the_rule_behind_a_score(self):
+        dom = harness.render(self.page)
+        found = harness.probe_result(dom)
+        self.assertNotIn('error', found, found)
+
+        self.assertTrue(found['before']['hidden'], 'a rule should start folded away')
+        self.assertFalse(found['before']['shown'], 'the rule was readable before it was asked for')
+        self.assertEqual(found['before']['expanded'], 'false')
+        self.assertEqual(
+            found['text'], '1.0 tastes of sugar on its own, 0.0 of nothing at all.')
+
+        self.assertFalse(found['opened']['hidden'])
+        self.assertTrue(found['opened']['shown'])
+        self.assertEqual(found['opened']['expanded'], 'true')
+
+        self.assertTrue(found['closed']['hidden'], 'the rule never folded back up')
+        self.assertEqual(found['closed']['expanded'], 'false')

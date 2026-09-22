@@ -283,6 +283,39 @@ main {
   pointer-events: none;
 }
 
+/* the rule behind a score is one button away, kept clear of the pin next to it */
+.list-item:has(.grade) {
+  padding-right: 4.25rem;
+}
+
+.grade {
+  position: absolute;
+  top: 0.5rem;
+  right: 2.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.grade[aria-expanded="true"] {
+  color: var(--accent);
+}
+
+.grade > svg {
+  pointer-events: none;
+}
+
+.rubric {
+  margin: 0.5rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 .sortable-ghost {
   opacity: 0.4;
 }
