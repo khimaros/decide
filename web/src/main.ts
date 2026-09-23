@@ -135,7 +135,10 @@ function requirementElement(requirement: Requirement, index: number): HTMLLIElem
     update();
   });
 
-  li.append(handle, requirement.name, force);
+  const tally = document.createElement("span");
+  tally.className = "tally";
+
+  li.append(handle, requirement.name, tally, force);
   if (requirement.rubric) {
     const rubric = rubricElement(requirement.rubric);
     li.append(gradeButton(rubric), rubric);
@@ -263,6 +266,37 @@ function releaseRoom(): void {
   document.body.classList.remove("dragging");
 }
 
+// how far the field already gets on one row, which is what tells a reader
+// whether ranking it would change their answer. the count reads the way the
+// scores are painted, so an anti-requirement counts what avoids it.
+function tallyOf(index: number, anti: boolean): [number, number] {
+  let met = 0;
+  let scored = 0;
+  for (const item of topic.items) {
+    const evaluation = item.evaluations[index];
+    if (!evaluation) continue;
+    scored += 1;
+    if (toneOf(evaluation.score, anti) === "score-good") met += 1;
+  }
+  return [met, scored];
+}
+
+// the columns decide how a row is counted, so the tallies are redrawn with the
+// rest of the ranking rather than when a row is dragged between them.
+function refreshTallies(): void {
+  for (const list of sortable) {
+    const anti = list === excluded;
+    for (const row of list.querySelectorAll<HTMLElement>(".list-item")) {
+      const tally = row.querySelector<HTMLElement>(".tally");
+      if (!tally || !row.dataset.requirement) continue;
+      const [met, scored] = tallyOf(Number(row.dataset.requirement), anti);
+      tally.textContent = `${met}/${scored}`;
+      tally.title = `${met} of ${scored} items ${anti ? "avoid" : "fully meet"} this`;
+      tally.hidden = scored === 0;
+    }
+  }
+}
+
 // rescore every item against the current ranking and redraw the results.
 function update(): void {
   const ranking: Ranking = {
@@ -272,6 +306,7 @@ function update(): void {
   };
   const scored = rankItems(topic, ranking);
   itemList.replaceChildren(...scored.map((entry) => itemElement(entry, ranking)));
+  refreshTallies();
 }
 
 async function main(): Promise<void> {

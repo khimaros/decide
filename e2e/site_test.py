@@ -239,6 +239,21 @@ items = [
         self.assertIn('no topics found', result.stderr)
 
 
+STALE_TOPIC = '''name = "Stale"
+
+requirements = [
+\t{ name = "Sweet", priority = 10 },
+]
+
+items = [
+\t{ name = "Apple", evaluations = [
+\t\t{ name = "Sweet", score = -inf, comment = "" },
+\t\t{ name = "Sweet", score = 1.0, comment = "ripe", sources = ["https://example.com/apples"] },
+\t]},
+]
+'''
+
+
 MESSY_TOPIC = '''name = "Messy"
 
 # ranked last on purpose
@@ -315,6 +330,20 @@ class FormatTest(unittest.TestCase):
 
         harness.fmt(self.data)
         self.assertEqual(harness.fmt(self.data, '--check').returncode, 0)
+
+    def test_a_stale_unevaluated_duplicate_folds_into_the_score(self):
+        self.write(STALE_TOPIC)
+        self.assertEqual(harness.fmt(self.data).returncode, 0)
+        out = self.formatted()
+        self.assertEqual(out.count('name = "Sweet"'), 2, 'one declaration and one evaluation')
+        self.assertNotIn('-inf', out, 'a stale unevaluated entry outlived the score')
+        self.assertIn('comment = "ripe"', out)
+
+        # an unevaluated entry that says why it is empty is a note worth keeping
+        self.write(STALE_TOPIC.replace('score = -inf, comment = ""',
+                                      'score = -inf, comment = "waiting on a phone build"'))
+        self.assertEqual(harness.fmt(self.data).returncode, 0)
+        self.assertEqual(self.formatted().count('name = "Sweet"'), 3)
 
     def test_orphaned_scores_survive_until_pruned(self):
         self.write(MESSY_TOPIC.replace('{ name = "Cheap", priority = 20 },\n', ''))
@@ -928,3 +957,115 @@ class RubricTest(unittest.TestCase):
 
         self.assertTrue(found['closed']['hidden'], 'the rule never folded back up')
         self.assertEqual(found['closed']['expanded'], 'false')
+
+
+# how many items the whole field already gets right on one row is what tells a
+# reader whether dragging that row to the top would change their answer, so the
+# tally has to be on the row before they start dragging.
+TALLY_TOPIC = '''name = "Tally"
+
+requirements = [
+\t{ name = "Sweet", priority = 10 },
+\t{ name = "Cheap", priority = 15 },
+\t{ name = "Bitter", priority = -10 },
+]
+
+items = [
+\t{ name = "Apple", evaluations = [
+\t\t{ name = "Sweet", score = 1.0, comment = "" },
+\t\t{ name = "Cheap", score = 0.5, comment = "" },
+\t\t{ name = "Bitter", score = 0.0, comment = "" },
+\t]},
+\t{ name = "Pear", evaluations = [
+\t\t{ name = "Sweet", score = 0.0, comment = "" },
+\t\t{ name = "Cheap", score = 0.0, comment = "" },
+\t\t{ name = "Bitter", score = 1.0, comment = "" },
+\t]},
+\t{ name = "Plum", evaluations = [
+\t\t{ name = "Sweet", score = 0.5, comment = "" },
+\t\t{ name = "Cheap", score = 1.0, comment = "" },
+\t\t{ name = "Bitter", score = -inf, comment = "" },
+\t]},
+]
+'''
+
+TALLY_PROBE = r"""
+(function () {
+  var out = document.createElement('pre');
+  out.id = 'probe';
+  out.textContent = '{}';
+  document.body.appendChild(out);
+
+  function report(o) { out.textContent = JSON.stringify(o); }
+
+  function tallies(list) {
+    return Array.prototype.map.call(
+      document.querySelectorAll('#' + list + ' .list-item'),
+      function (row) {
+        var tally = row.querySelector('.tally');
+        return tally ? tally.textContent : 'none';
+      });
+  }
+
+  function run(tries) {
+    var drawn = document.querySelector('#requirements .list-item .tally');
+    if (!drawn) {
+      if ((tries || 0) > 100) report({error: 'no tally was ever drawn'});
+      else setTimeout(function () { run((tries || 0) + 1); }, 20);
+      return;
+    }
+    report({
+      requirements: tallies('requirements'),
+      anti: tallies('antirequirements'),
+      titles: Array.prototype.map.call(
+        document.querySelectorAll('#requirements .list-item .tally'),
+        function (tally) { return tally.title; })
+    });
+  }
+
+  run(0);
+})();
+"""
+
+
+class TallyTest(unittest.TestCase):
+    """a requirement a reader ranks says nothing about whether ranking it will
+    move anything, so each row carries how many items the field already meets it
+    out of how many were scored on it. an anti-requirement counts the items that
+    avoid it, since that is the same tally read the other way round."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        data = os.path.join(cls.tmp.name, 'data')
+        os.makedirs(os.path.join(data, 'topics'))
+        with open(os.path.join(data, 'topics', 'tally.toml'), 'w') as f:
+            f.write(TALLY_TOPIC)
+
+        cls.output = os.path.join(cls.tmp.name, SITE_DIR)
+        result = harness.build(cls.output, data=data)
+        if result.returncode != 0:
+            raise AssertionError('build failed:\n%s%s' % (result.stdout, result.stderr))
+        harness.probe(os.path.join(cls.output, 'topics', 'tally', 'index.html'), TALLY_PROBE)
+        cls.server = harness.WebServer(cls.tmp.name).__enter__()
+        cls.page = urljoin(cls.server.url, '%s/topics/tally/' % SITE_DIR)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.__exit__(None, None, None)
+        cls.tmp.cleanup()
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_every_requirement_row_counts_the_field(self):
+        found = harness.probe_result(harness.render(self.page))
+        self.assertNotIn('error', found, found)
+        self.assertEqual(found['requirements'], ['1/3', '1/3'])
+        for title in found['titles']:
+            self.assertIn('of 3', title, 'a tally nobody can explain is a number')
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_an_anti_requirement_counts_what_avoids_it(self):
+        found = harness.probe_result(harness.render(self.page))
+        self.assertNotIn('error', found, found)
+        self.assertEqual(found['anti'], ['1/2'],
+                         'the unscored item should be left out of the count')

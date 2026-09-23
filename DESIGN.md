@@ -38,6 +38,12 @@ orphaned evaluations are refused rather than deleted, because they hold
 scores and hand-written comments that a renamed requirement should not
 quietly discard.
 
+the one duplicate it does delete is an unevaluated entry a real score for the
+same requirement has overtaken, which is what editing a score in above a
+`-inf` leaves behind. the loader already ignores such an entry, so nothing was
+wrong on the page and the stale line simply lingered. an entry that writes down
+why it is still empty keeps its place, since that note is its only copy.
+
 it also counts the scores that cite no source and warns about them on every
 run. that count is the one thing in the file the formatter deliberately will
 not fix: it can write a missing entry, but finding a source is research, not
@@ -74,6 +80,13 @@ is exactly such a change. so as a drag begins every list grows by the height
 of the row in flight: the list it left keeps its height, the list it lands in
 already had the room, and no card resizes in between. the reserved strip is
 drawn dashed, so the space doubles as the invitation to drop.
+
+every requirement row carries how many items fully meet it out of how many were
+scored on it. the count goes through `toneOf`, so a row and the scores behind it
+cannot disagree about what counts as met, and it is redrawn with the rest of the
+ranking rather than when a row is dropped, because the column a row sits in is
+what decides the question it is being asked: an anti-requirement counts the items
+that avoid it.
 
 `web/src/score.ts` is pure: items in, ranked items out. `web/src/main.ts`
 owns the DOM, and treats the DOM as the single source of truth for the

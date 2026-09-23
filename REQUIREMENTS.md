@@ -18,6 +18,9 @@ data entry problem.
 - a requirement graded by a rule hands that rule to the reader: a **rubric**
   travels with the requirement and opens on the page, so that a 0.7 meaning
   "almost" and a 0.7 meaning "only on the vendor's cloud" never read the same
+- a row says whether ranking it is worth anything: every requirement counts how
+  many items fully meet it out of how many were scored on it, counted the same
+  way its scores are coloured, and an anti-requirement counts what avoids it
 - `make check` gates the build on both rules, so a topic that breaks one never
   ships
 

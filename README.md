@@ -23,6 +23,11 @@ first three columns. press an item to see the score behind every
 requirement, along with any comment explaining it and the sources it was
 taken from. a source that is a URL is a link, named for its site.
 
+every requirement carries a tally beside its name: how many items fully meet it,
+out of how many were scored on it at all. a row reading 1/9 moves the list the
+moment you rank it, and one reading 9/9 does not move it at all. an
+anti-requirement counts the items that avoid it instead.
+
 the bookmark toggle on a requirement insists on it: items that do not fully
 meet a forced requirement are struck through and pushed down the list. a
 requirement that was graded against a written rule carries an info button, and
@@ -104,7 +109,8 @@ topics/dweb-social.toml: unchanged
 
 it gives every item an entry for every requirement, puts requirements in
 the order the site ranks them, sorts items by name with `skip` templates
-first, and lines each item's evaluations up with the requirements. comments
+first, lines each item's evaluations up with the requirements, and drops an
+unevaluated entry the same item already scores for real. comments
 and existing formatting are preserved, and running it twice changes
 nothing.
 

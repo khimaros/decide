@@ -27,6 +27,7 @@ const NAME: &str = "name";
 const PRIORITY: &str = "priority";
 const SKIP: &str = "skip";
 const SCORE: &str = "score";
+const COMMENT: &str = "comment";
 const SOURCES: &str = "sources";
 
 /// indentation for entries added to an array that has none to copy.
@@ -50,6 +51,10 @@ pub struct Report {
     pub path: PathBuf,
     pub added: usize,
     pub pruned: usize,
+    /// empty unevaluated entries dropped because the same item scores that
+    /// requirement for real, which is what editing a score in above a
+    /// `-inf` leaves behind.
+    pub folded: usize,
     pub changed: bool,
     /// evaluations carrying a real score, which are the ones a source can be
     /// asked for. an unevaluated entry is excluded: it cites nothing because
@@ -214,6 +219,8 @@ fn fill_item(
         report.pruned += orphans.len();
     }
 
+    report.folded += fold_unevaluated(evaluations);
+
     let present: HashSet<String> = evaluations.iter().filter_map(entry_name).collect();
     let prefix = entry_prefix(evaluations);
     for name in names.iter().filter(|name| !present.contains(*name)) {
@@ -237,6 +244,34 @@ fn fill_item(
         }
     }
     Ok(())
+}
+
+/// drop the unevaluated entries an item's own score has overtaken, so a stale
+/// `-inf` cannot sit above a real score and outlive it. an entry that writes
+/// down why it is still empty keeps its place, since that note is the only copy.
+fn fold_unevaluated(evaluations: &mut Array) -> usize {
+    let scored: HashSet<String> = evaluations
+        .iter()
+        .filter(|value| is_scored(value))
+        .filter_map(entry_name)
+        .collect();
+
+    let before = evaluations.len();
+    evaluations.retain(|value| {
+        let overtaken = !is_scored(value)
+            && is_blank(value)
+            && entry_name(value).is_some_and(|name| scored.contains(&name));
+        !overtaken
+    });
+    before - evaluations.len()
+}
+
+/// an entry that writes down nothing but a name nobody scored.
+fn is_blank(value: &Value) -> bool {
+    let quiet = field(value, COMMENT)
+        .and_then(Value::as_str)
+        .is_none_or(|body| body.trim().is_empty());
+    quiet && !is_cited(value)
 }
 
 /// an entry nobody has scored claims nothing, so it is not asked for a source.

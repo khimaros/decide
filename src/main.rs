@@ -106,6 +106,9 @@ fn format_topics(args: &Args) -> Result<(), String> {
                 if report.pruned > 0 {
                     changes.push(format!("pruned {} orphaned", report.pruned));
                 }
+                if report.folded > 0 {
+                    changes.push(format!("folded {} duplicated", report.folded));
+                }
                 changes.push("reordered".to_string());
                 println!("{path}: {}", changes.join(", "));
             }

@@ -283,6 +283,16 @@ main {
   pointer-events: none;
 }
 
+/* how many items the field already meets this, so a reader can see which rows
+   are worth dragging before they start */
+.tally {
+  padding-left: 0.4em;
+  color: var(--muted);
+  font-size: 0.8em;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 /* the rule behind a score is one button away, kept clear of the pin next to it */
 .list-item:has(.grade) {
   padding-right: 4.25rem;
