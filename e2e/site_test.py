@@ -723,10 +723,11 @@ class ShippedHarnessTopicsTest(ShippedTopic, unittest.TestCase):
 
 
 class ShippedHarnessOrchestratorTopicTest(ShippedTopic, unittest.TestCase):
-    """an ADE is chosen for how far it reaches and what it will drive, so the
-    rows the product owner asked for are the ones a reader has to be able to
-    rank for every item: who runs the project, how you talk to it, how it
-    isolates the work, which surfaces ship, and which harnesses it fronts."""
+    """a harness orchestrator is chosen for how far it reaches and what it will
+    drive, so the rows the product owner asked for are the ones a reader has to
+    be able to rank for every item: who runs the project, how you talk to it,
+    how it isolates the work, which surfaces ship, and which harnesses it
+    fronts."""
 
     slug = 'harness-orchestrator'
 
@@ -738,6 +739,7 @@ class ShippedHarnessOrchestratorTopicTest(ShippedTopic, unittest.TestCase):
         'Voice: Speech',
         'Voice: Conversation',
         'Git Worktrees',
+        'TUI',
         'Web UI',
         'iOS App',
         'Android App',
@@ -750,27 +752,35 @@ class ShippedHarnessOrchestratorTopicTest(ShippedTopic, unittest.TestCase):
         'Harness: ACP',
     )
 
-    def test_every_ade_is_scored_on_what_it_was_asked_for(self):
+    def test_every_orchestrator_is_scored_on_what_it_was_asked_for(self):
         for name in self.ASKED_FOR:
             self.assertEqual([], self.unscored(name), '%s is a gap' % name)
 
-    def test_every_ade_score_cites_a_source(self):
+    def test_every_orchestrator_score_cites_a_source(self):
         for name in self.ASKED_FOR:
             self.assertEqual([], self.uncited(name), '%s cites nothing' % name)
 
-    def test_the_topic_lists_the_ades_a_reader_compares_today(self):
+    def test_the_topic_lists_the_orchestrators_a_reader_compares_today(self):
         named = {i['name'] for i in self.topic['items']}
-        for adequate in ('Orca', 'T3 Code', 'Paseo'):
-            self.assertIn(adequate, named)
+        for listed in ('Orca', 'T3 Code', 'Paseo', 'Google AX'):
+            self.assertIn(listed, named)
 
     @unittest.skipUnless(harness.CHROME, 'no chrome available')
-    def test_a_reader_can_rank_how_an_ade_talks_back(self):
+    def test_a_reader_can_rank_how_an_orchestrator_talks_back(self):
         page = urljoin(self.server.url, '%s/topics/%s/' % (SITE_DIR, self.slug))
         dom = harness.render(page)
         listed = re.search(r'<ul class="list sortable" id="requirements">(.*?)</ul>', dom, re.S)
         self.assertTrue(listed, 'the requirements list never rendered')
         for name in ('Voice: Conversation', 'Sandboxing'):
             self.assertIn(name, listed.group(1))
+
+    @unittest.skipUnless(harness.CHROME, 'no chrome available')
+    def test_a_reader_can_rank_the_terminal(self):
+        page = urljoin(self.server.url, '%s/topics/%s/' % (SITE_DIR, self.slug))
+        dom = harness.render(page)
+        listed = re.search(r'<ul class="list sortable" id="requirements">(.*?)</ul>', dom, re.S)
+        self.assertTrue(listed, 'the requirements list never rendered')
+        self.assertIn('TUI', listed.group(1))
 
     def test_the_rows_that_are_graded_by_a_rule_carry_it(self):
         # these are the requirements where a README lie is cheapest, so the
@@ -780,6 +790,7 @@ class ShippedHarnessOrchestratorTopicTest(ShippedTopic, unittest.TestCase):
             'Voice: Dictation',
             'Voice: Speech',
             'Voice: Conversation',
+            'TUI',
             'Web UI',
             'iOS App',
             'Android App',

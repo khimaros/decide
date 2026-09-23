@@ -32,27 +32,34 @@ data entry problem.
   terminal, and a mobile app that drives a different product of the same
   vendor counts only as the adapter it is
 
-## ade topic
+## harness-orchestrator topic
 
-an ADE is the surface a developer drives coding agents from, so its item is
-the control surface and its backend is a harness. the harnesses themselves are
-compared in the ai-harness topic and are only scored here as backends.
+a harness orchestrator is the surface a developer drives coding agents from, so
+its item is the control surface and its backend is a harness. the harnesses
+themselves are compared in the ai-harness topic and are only scored here as
+backends. a runtime counts as a surface when the reader drives it directly, so a
+manifest and a command line qualify and a platform that only runs its own agents
+does not.
 
-- an ADE is judged on reaching the work, not on doing it: **Web UI**, **iOS
+- it is judged on reaching the work, not on doing it: **Web UI**, **iOS
   App**, **Android App**, **Desktop App** and **Desktop: Linux** each track a
-  surface the project ships itself, and driving one ADE from another vendor's
-  app counts only as the adapter it is
+  surface the project ships itself, and driving one orchestrator from another
+  vendor's app counts only as the adapter it is
+- **TUI** tracks the terminal as a surface of its own: the product's own screen
+  in a terminal scores highest, a terminal showing the harness's interface or a
+  bare command line scores as the access it is, and a command line that scripts
+  the product is scored properly under **SDK/API**
 - a conversation has two ends, so speech is scored twice: **Voice: Dictation**
   for spoken input, **Voice: Speech** for read-aloud output, and **Voice:
   Conversation** for a hands-free mode that holds a turn taking dialogue
 - **Git Worktrees** and **Parallel Agents** are separate rows, because fanning
   one prompt across isolated trees and running several agents in one checkout
   are different claims
-- **Sandboxing** scores isolation *of the harness by the ADE*: a container, a
-  VM, a seatbelt or a jail the agent runs inside. permission prompts and
-  allow-lists are the harness's own, so they score nothing here
-- **Browser Control** scores the ADE steering a browser on the agent's behalf,
-  which is where an embedded preview, a click-to-prompt design mode or a
+- **Sandboxing** scores isolation *of the harness by the orchestrator*: a
+  container, a VM, a seatbelt or a jail the agent runs inside. permission prompts
+  and allow-lists are the harness's own, so they score nothing here
+- **Browser Control** scores the orchestrator steering a browser on the agent's
+  behalf, which is where an embedded preview, a click-to-prompt design mode or a
   computer-use tool all count
 - the backend rows name the harnesses a reader can pick today: Claude Code,
   Codex, OpenCode, Pi, Cursor, **Harness: ACP** for anything speaking the agent
